@@ -102,151 +102,127 @@ for c=1:Cr;
             if flag==1;
             nonzero(1)=nonzero(1)+1;
             end;
-        end;
-        if n1==0 & n2==0 & t1==0 & t2~=0
+        elseif n1==0 & n2==0 & t1==0 & t2~=0
             contributions(2)=contributions(2)+1;
             if flag==1;
             nonzero(2)=nonzero(2)+1;
             end;
-        end;
-        if n1==0 & n2==0 & t1~=0 & t2==0
+        elseif n1==0 & n2==0 & t1~=0 & t2==0
             contributions(3)=contributions(3)+1;
             if flag==1;
             nonzero(3)=nonzero(3)+1;
             %TT3(nonzero(3),:)=[t1 t2];
             end;
-        end;
-        if n1==0 & n2==0 & t1~=0 & t2~=0 & t1~=t2
+        elseif n1==0 & n2==0 & t1~=0 & t2~=0 & t1~=t2
             contributions(4)=contributions(4)+1;
             if flag==1;
             nonzero(4)=nonzero(4)+1;
             end;
-        end;
-        if n1==0 & n2==0 & t1~=0 & t2~=0 & t1==t2
+        elseif n1==0 & n2==0 & t1~=0 & t2~=0 & t1==t2
             contributions(5)=contributions(5)+1;
             if flag==1;
             nonzero(5)=nonzero(5)+1;
             end;
-        end;
-        if n1==0 & n2~=0 & t1==0 & t2==0 
+        elseif n1==0 & n2~=0 & t1==0 & t2==0 
             contributions(6)=contributions(6)+1;
             if flag==1;
             nonzero(6)=nonzero(6)+1;
             end;
-        end;
-        if n1==0 & n2~=0 & t1==0 & t2~=0 
+        elseif n1==0 & n2~=0 & t1==0 & t2~=0 
             contributions(7)=contributions(7)+1;
             if flag==1;
             nonzero(7)=nonzero(7)+1;
             end;
-        end;
-        if n1==0 & n2~=0 & t1~=0 & t2==0 
+        elseif n1==0 & n2~=0 & t1~=0 & t2==0 
             contributions(8)=contributions(8)+1;
             if flag==1;
             nonzero(8)=nonzero(8)+1;
             end;
-        end;
-        if n1==0 & n2~=0 & t1~=0 & t2~=0 & t1~=t2
+        elseif n1==0 & n2~=0 & t1~=0 & t2~=0 & t1~=t2
             contributions(9)=contributions(9)+1;
             if flag==1;
             nonzero(9)=nonzero(9)+1;
             %TT9(nonzero(9),:)=[t1 t2];
             end;
-        end;
-        if n1==0 & n2~=0 & t1~=0 & t2~=0 & t1==t2
+        elseif n1==0 & n2~=0 & t1~=0 & t2~=0 & t1==t2
             contributions(10)=contributions(10)+1;
             if flag==1;
             nonzero(10)=nonzero(10)+1;
             end;
-        end;
-        if n1~=0 & n2==0 & t1==0 & t2==0 
+        elseif n1~=0 & n2==0 & t1==0 & t2==0 
             contributions(11)=contributions(11)+1;
             if flag==1;
             nonzero(11)=nonzero(11)+1;
             end;
-        end;
-        if n1~=0 & n2==0 & t1==0 & t2~=0 
+        elseif n1~=0 & n2==0 & t1==0 & t2~=0 
             contributions(12)=contributions(12)+1;
             if flag==1;
             nonzero(12)=nonzero(12)+1;
             end;
-        end;
-        if n1~=0 & n2==0 & t1~=0 & t2==0 
+        elseif n1~=0 & n2==0 & t1~=0 & t2==0 
             contributions(13)=contributions(13)+1;
             if flag==1;
             nonzero(13)=nonzero(13)+1;
             end;
-        end;
-        if n1~=0 & n2==0 & t1~=0 & t2~=0 & t1~=t2
+        elseif n1~=0 & n2==0 & t1~=0 & t2~=0 & t1~=t2
             contributions(14)=contributions(14)+1;
             if flag==1;
             nonzero(14)=nonzero(14)+1;
             %TT14(nonzero(14),:)=[t1 t2];
             end;
-        end;
-        if n1~=0 & n2==0 & t1~=0 & t2~=0 & t1==t2
+        elseif n1~=0 & n2==0 & t1~=0 & t2~=0 & t1==t2
             contributions(15)=contributions(15)+1;
             if flag==1;
             nonzero(15)=nonzero(15)+1;
             end;
-        end;
-        if n1~=0 & n2~=0 & t1==0 & t2==0 & n1~=n2
+        elseif n1~=0 & n2~=0 & t1==0 & t2==0 & n1~=n2
             contributions(16)=contributions(16)+1;
             if flag==1;
             nonzero(16)=nonzero(16)+1;
             end;
-        end;
-        if n1~=0 & n2~=0 & t1==0 & t2==0 & n1==n2
+        elseif n1~=0 & n2~=0 & t1==0 & t2==0 & n1==n2
             contributions(17)=contributions(17)+1;
             if flag==1;
             nonzero(17)=nonzero(17)+1;
             end;
-        end;
-        if n1~=0 & n2~=0 & t1==0 & t2~=0 & n1~=n2
+        elseif n1~=0 & n2~=0 & t1==0 & t2~=0 & n1~=n2
             contributions(18)=contributions(18)+1;
             if flag==1;
             nonzero(18)=nonzero(18)+1;
             end;
-        end;
-        if n1~=0 & n2~=0 & t1==0 & t2~=0 & n1==n2
+        elseif n1~=0 & n2~=0 & t1==0 & t2~=0 & n1==n2
             contributions(19)=contributions(19)+1;
             if flag==1;
             nonzero(19)=nonzero(19)+1;
             end;
-        end;
-        if n1~=0 & n2~=0 & t1~=0 & t2==0 & n1~=n2
+        elseif n1~=0 & n2~=0 & t1~=0 & t2==0 & n1~=n2
             contributions(20)=contributions(20)+1;
             if flag==1;
             nonzero(20)=nonzero(20)+1;
             end;
-        end;
-        if n1~=0 & n2~=0 & t1~=0 & t2==0 & n1==n2
+        elseif n1~=0 & n2~=0 & t1~=0 & t2==0 & n1==n2
             contributions(21)=contributions(21)+1;
             if flag==1;
             nonzero(21)=nonzero(21)+1;
             end;
-        end;
-        if n1~=0 & n2~=0 & t1~=0 & t2~=0 & n1~=n2 & t1~=t2
+        elseif n1~=0 & n2~=0 & t1~=0 & t2~=0 & n1~=n2 & t1~=t2
             contributions(22)=contributions(22)+1;
             if flag==1;
             nonzero(22)=nonzero(22)+1;
             %TT22(nonzero(22),:)=[t1 t2];
             end;
-        end;
-        if n1~=0 & n2~=0 & t1~=0 & t2~=0 & n1~=n2 & t1==t2
+        elseif n1~=0 & n2~=0 & t1~=0 & t2~=0 & n1~=n2 & t1==t2
             contributions(23)=contributions(23)+1;
             if flag==1;
             nonzero(23)=nonzero(23)+1;
             end;
-        end;
-        if n1~=0 & n2~=0 & t1~=0 & t2~=0 & n1==n2 & t1~=t2
+        elseif n1~=0 & n2~=0 & t1~=0 & t2~=0 & n1==n2 & t1~=t2
             contributions(24)=contributions(24)+1;
             if flag==1;
             nonzero(24)=nonzero(24)+1;
             %TT24(nonzero(24),:)=[t1 t2];
             end;
-        end;
-        if n1~=0 & n2~=0 & t1~=0 & t2~=0 & n1==n2 & t1==t2
+        elseif n1~=0 & n2~=0 & t1~=0 & t2~=0 & n1==n2 & t1==t2
             contributions(25)=contributions(25)+1;
             if flag==1;
             nonzero(25)=nonzero(25)+1;
