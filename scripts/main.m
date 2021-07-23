@@ -43,10 +43,10 @@ end;
  
 % Only analyze part of the image
 % determined by Rr and Cr
-T1=15;  % was 20 for the draft
-N1=15;   % was 5 for the draft
-T2=15;  % was 20 for the draft
-N2=15;   % was 5 for the draft
+T1=7;  % was 20 for the draft
+N1=7;   % was 5 for the draft
+T2=7;  % was 20 for the draft
+N2=7;   % was 5 for the draft
 
  
 Cr=C-max(T1,T2);
