@@ -1,5 +1,5 @@
 using DrWatson
-@quickactivate "UniqueCharacterizationSTNNA"
+@quickactivate "RasterUniqueCharacterizationCode"
 
 println(
 """

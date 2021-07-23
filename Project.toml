@@ -1,4 +1,4 @@
-name = "UniqueCharacterizationSTNNA"
+name = "RasterUniqueCharacterizationCode"
 [compat]
 julia = "1.6.1"
 DrWatson = "2.1.0"
