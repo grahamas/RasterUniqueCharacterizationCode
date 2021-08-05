@@ -50,7 +50,8 @@ N2=7;   % was 5 for the draft
 
  
 Cr=C-max(T1,T2);
-Rr=R-max(N1,N2);
+Rmax=R-max(idivide(N1,2),idivide(N2,2));
+Rmin=1+max(idivide(N1,2),idivide(N2,2))
 
  
 %figure;
@@ -80,9 +81,9 @@ nonzero=zeros(1,25);
  
 % list of the lags
 for t1=0:T1;
-for n1=0:N1;
+for n1=-idivide(N1,2):idivide(N1,2);
 for t2=0:T2;
-for n2=0:N2;
+for n2=-idivide(N2,2):idivide(N2,2);
 
  
 % compute Eq (15)
