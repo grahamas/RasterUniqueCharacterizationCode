@@ -69,7 +69,7 @@ end
 fig3[1,2] = subfig3B
 
 
-subfig3C = let freq = 0.04, θ=-2π, noise_amplitude = 0;
+fig3[1,3] = subfig3C = let freq = 0.04, θ=-2π, noise_amplitude = 0;
     raster_coords = IterTools.product(1:N_neurons, 1:N_times)
     raster_signal = map(raster_coords) do (i_neuron, i_time)
         (sin(2π*freq*i_time + θ*i_neuron/N_neurons) + 1) / 2
@@ -93,8 +93,6 @@ subfig3C = let freq = 0.04, θ=-2π, noise_amplitude = 0;
     # rowsize!(sublayout, 1, Aspect)
     sublayout
 end
-
-fig3[1,3] = subfig3C
 
 subfig3D = let freq = 0.04, θ=0, noise_amplitude=0.5, signal_amplitude=0.5;
     raster_coords = IterTools.product(1:N_neurons, 1:N_times)
