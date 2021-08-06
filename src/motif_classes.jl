@@ -65,6 +65,8 @@ function _2_neuron_motif_classification(n1, n2, t1, t2)
         elseif (t2 == 0) || (t1 > 0)
             # Synchrony is second
             return 8
+        else
+            error("Shouldn't be here")
         end
     elseif n_distinct_times == 3
         if (n1 == 0)
@@ -92,6 +94,8 @@ function _2_neuron_motif_classification(n1, n2, t1, t2)
                 else
                     error("Shouldn't be here")
                 end
+            else
+                error("Shouldn't be here")
             end
         elseif (n1 == n2)
             if (0 < t1)

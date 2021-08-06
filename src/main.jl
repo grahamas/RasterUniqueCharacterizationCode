@@ -1,6 +1,11 @@
+using DrWatson; quickactivate(@__DIR__)
+
 using CSV, Tables, DataFrames, IterTools
+using LoopVectorization
+using CairoMakie
 
 include(srcdir("rasters.jl"))
 include(srcdir("motif_classes.jl"))
 include(srcdir("triple_correlation.jl"))
 include(srcdir("latex_table.jl"))
+include(srcdir("plotting.jl"))
