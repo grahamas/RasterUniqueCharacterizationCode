@@ -43,11 +43,11 @@ function calculate_unscaled_triple_correlation!(correlation::Array{T,4}, raster:
     time_range = (1-minimum(time_lag_range)):(N_times-maximum(time_lag_range))
     neuron_range = (1-minimum(neuron_lag_range)):(N_neurons-maximum(neuron_lag_range))
 
-    for i_n1 ∈ eachindex(neuron_lag_range), i_n2 ∈ eachindex(neuron_lag_range), 
-            i_t1 ∈ eachindex(time_lag_range), i_t2 ∈ eachindex(time_lag_range)
-        n1, n2, t1, t2 = neuron_lag_range[i_n1], neuron_lag_range[i_n2], time_lag_range[i_t1], time_lag_range[i_t2]
+    @turbo for i_n1 ∈ eachindex(neuron_lag_range), i_n2 ∈ eachindex(neuron_lag_range),  i_t1 ∈ eachindex(time_lag_range), i_t2 ∈ eachindex(time_lag_range)
+        n1, n2, t1, t2 = neuron_lag_range[i_n1], neuron_lag_range[i_n2], 
+time_lag_range[i_t1], time_lag_range[i_t2]
         accum = 0
-        @turbo for i_neuron ∈ neuron_range, i_time ∈ time_range
+        for i_neuron ∈ neuron_range, i_time ∈ time_range
             accum += raster[i_neuron, i_time] * raster[i_neuron+n1,i_time+t1] * raster[i_neuron+n2,i_time+t2]
         end
         correlation[i_n1,i_n2,i_t1,i_t2] = accum
