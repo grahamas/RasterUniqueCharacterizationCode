@@ -56,7 +56,7 @@ function _2_neuron_motif_classification(n1, n2, t1, t2)
         # Two neurons are the same, all times are the same
         return 4
     elseif n_distinct_times == 2
-        if (0 == t1 && 0 == n1) || (t1 == t2 && n1 == n2) || (0 == t2 && 0 == t2)
+        if (0 == t1 && 0 == n1) || (t1 == t2 && n1 == n2) || (0 == t2 && 0 == n2)
             # Base and first nodes are same; or first and second
             return 6
         elseif (t1 == 0) || (t2 < 0)

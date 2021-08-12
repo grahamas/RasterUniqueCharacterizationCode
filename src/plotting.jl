@@ -1,7 +1,13 @@
 noto_sans_bold = assetpath("fonts", "NotoSans-Bold.ttf")
 
 abbrev_count_label = x -> begin
-        if x >= 1000000
+        if x >= 1000000000
+            try
+                "$(Int(x / 1000000000))B"
+            catch
+                "$(x / 1000000000)B"
+            end
+        elseif x >= 1000000
             try
                 "$(Int(x / 1000000))M"
             catch
@@ -32,10 +38,10 @@ bar_theme = Theme(
     )
 )
 
-function plot_network_class_contributions!(ax, raster::BitMatrix, neuron_window_size, time_window_size)
+function plot_network_class_contributions!(ax, raster::BitMatrix, neuron_window_size, time_window_size; fillto=0.)
 
     network_class_contributions = triple_correlation_network_classifications(raster, neuron_window_size, time_window_size)
-    plt = barplot!(ax, 1:14 |> collect, (network_class_contributions));
+    plt = barplot!(ax, 1:14 |> collect, network_class_contributions; fillto=fillto);
     ax.xticks = [1:5:14...]
     ax.xtickformat[] = xs -> (roman_encode ∘ Int).(xs)
     tightlimits!(ax)

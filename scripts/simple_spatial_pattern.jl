@@ -7,7 +7,7 @@ TT_fig, NN_fig = let freq=0.1, θ=-2π, N_neurons=150, N_times=150,
 
 raster_coords = IterTools.product(1:N_neurons, 1:N_times)
 raster_signal = map(raster_coords) do (i_neuron, i_time)
-    (sin(2π*freq*i_time + θ*i_neuron/N_neurons) + 1) / 2
+    i_neuron % 10 == 1 ? (sin(2π*freq*i_time + θ*i_neuron/N_neurons) + 1) / 2 : 0
 end
 raster = BitArray(raster_signal .> 0.5)
 triple_correlation = calculate_unscaled_triple_correlation(raster, neuron_window, time_window)
