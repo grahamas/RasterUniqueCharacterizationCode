@@ -257,7 +257,7 @@ end
 
 function connectivity_classify_motif_classes(motif_classes::Vector{<:Tuple})
     classified_motif_classes = map(motif_classes) do class_row
-        (class_row..., classify_network_motif(class_row[begin+1:end]...).name)
+        (class_row..., classify_network_motif(class_row[begin+1:end]...))
     end
 end
 

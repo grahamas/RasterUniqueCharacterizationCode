@@ -26,13 +26,30 @@ let N_neurons = 150, N_times = 150, window_size = 15, transform=log10;
 #     end
 # end
 
+# properties_string_by_pattern = Dict(
+#     "I" => "Level of Activity",
+#     "II" => "Level of Activity, Local Dynamics",
+#     "III" => "Local Dynamics",
+#     "IV" => "Level of Activity, Synchrony",
+#     "V" => "Synchrony",
+#     "VI" => "Level of Activity, Feedforward",
+#     "VII" => "Local Dynamics, Synchrony, Feedforward",
+#     "VIII" => "Local Dynamics, Synchrony, Feedforward",
+#     "IX" => "Local Dynamics, Feedforward",
+#     "X" => "Local Dynamics, Feedforward",
+#     "XI" => "Local Dynamics, Feedforward, Feedback",
+#     "XII" => "Synchrony, Feedforward, Divergence  ",
+#     "XIII" => "Synchrony, Feedforward, Convergence  ",
+#     "XIV" => "Feedforward, Convergence, Divergence"
+# )
+
 properties_string_by_pattern = Dict(
     "I" => "Level of Activity",
-    "II" => "Level of Activity, Local Dynamics",
+    "II" => "Local Dynamics",
     "III" => "Local Dynamics",
-    "IV" => "Level of Activity, Synchrony",
+    "IV" => "Synchrony",
     "V" => "Synchrony",
-    "VI" => "Level of Activity, Feedforward",
+    "VI" => "Feedforward",
     "VII" => "Local Dynamics, Synchrony, Feedforward",
     "VIII" => "Local Dynamics, Synchrony, Feedforward",
     "IX" => "Local Dynamics, Feedforward",

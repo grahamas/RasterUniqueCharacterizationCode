@@ -49,7 +49,7 @@ using LaTeXStrings
 
 function latexify(df::DataFrame)
     """
-Spike Motif & \$n_1\$ & \$n_2\$ & \$t_1\$ & \$t_2\$ & Constraints & Network Motif & Configuration \\\\
+Lag Motif & \$n_1\$ & \$n_2\$ & \$t_1\$ & \$t_2\$ & Constraints & Information Flow Pattern & Configuration \\\\
     \\hline
     """ *
     join(latexify.(eachrow(df)), "\\\\\n")
@@ -64,10 +64,8 @@ function graphics_scaling_string(n_same_neurons, n_same_times)
 end
 
 function latexify(row::DataFrameRow)
-    n_same_neurons = count_same(0, row.n1, row.n2)
-    n_same_times = count_same(0, row.t1, row.t2)
 
     row_contents = join(getproperty.(Ref(row), ["spike_motif", "n1", "n2", "t1", "t2", "conditions", "connection_motif"]), "&")
-    row_contents *= "& \\adjustbox{padding=0em 0.5em 0em 0.5em, raise=-0.33\\height}{\\includegraphics[$(graphics_scaling_string(n_same_neurons, n_same_times))]{motif_figs/$(row.spike_motif).png}}"
+    row_contents *= "& \\adjustbox{padding=0em 0.5em 0em 0.5em, raise=-0.33\\height}{\\includegraphics{motif_figs/$(row.spike_motif).png}}"
     return row_contents
 end
