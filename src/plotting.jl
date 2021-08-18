@@ -38,9 +38,16 @@ bar_theme = Theme(
     )
 )
 
-function plot_network_class_contributions!(ax, raster::BitMatrix, neuron_window_size, time_window_size; fillto=0.)
+function plot_network_class_contributions!(ax, raster::BitMatrix, neuron_max_lag, time_max_lag; fillto=10^-1)
 
-    network_class_contributions = triple_correlation_network_classifications(raster, neuron_window_size, time_window_size)
+    network_class_contributions = triple_correlation_network_classifications(raster, neuron_max_lag, time_max_lag)
+    fillto=if ax.yscale[] == log10
+        ax.ytickformat[] = Makie.automatic
+        fillto_exp = minimum(floor.(log10.(network_class_contributions)))
+        10^fillto_exp
+    else
+        0.
+    end
     plt = barplot!(ax, 1:14 |> collect, network_class_contributions; fillto=fillto);
     ax.xticks = [1:5:14...]
     ax.xtickformat[] = xs -> (roman_encode ∘ Int).(xs)
@@ -51,9 +58,9 @@ function plot_network_class_contributions!(ax, raster::BitMatrix, neuron_window_
 end
 
 using Makie
-function plot_relative_network_class_contributions!(ax, raster::BitMatrix, potential_contributions, neuron_window_size, time_window_size)
+function plot_relative_network_class_contributions!(ax, raster::BitMatrix, potential_contributions, neuron_max_lag, time_max_lag)
     ax.ytickformat[] = Makie.automatic
-    network_class_contributions = triple_correlation_network_classifications(raster, neuron_window_size, time_window_size)
+    network_class_contributions = triple_correlation_network_classifications(raster, neuron_max_lag, time_max_lag)
     relative_contributions = network_class_contributions ./ potential_contributions
     plt = stem!(ax, 1:14 |> collect, (relative_contributions); ytickformat=identity);
     ax.xticks = [1:5:14...]

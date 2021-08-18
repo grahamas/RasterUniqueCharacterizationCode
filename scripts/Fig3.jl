@@ -6,10 +6,10 @@ fig3 = with_theme(bar_theme) do
 fig3 = Figure(resolution=(1600, 2400))
 
 let N_neurons = 150, N_times = 150,
-        neuron_window = 15, time_window = 15;
+        neuron_max_lag = 7, time_max_lag = 7;
 all_ones_raster = BitArray(ones(N_neurons, N_times))
 potential_contributions = triple_correlation_network_classifications(
-    all_ones_raster, neuron_window, time_window
+    all_ones_raster, neuron_max_lag, time_max_lag
 )
 
 subfig3A = let freq = 0.12, θ=0, noise_amplitude = 0, signal_amplitude=1;
@@ -22,9 +22,9 @@ subfig3A = let freq = 0.12, θ=0, noise_amplitude = 0, signal_amplitude=1;
 
    # contributions_axis = CairoMakie.Axis(fig3)
     relative_contributions_axis = CairoMakie.Axis(fig3)
-    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_window, time_window)
+    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_max_lag, time_max_lag)
     raster_axis = CairoMakie.Axis(fig3)    
-    # plot_network_class_contributions!(contributions_axis, raster, neuron_window, time_window)
+    # plot_network_class_contributions!(contributions_axis, raster, neuron_max_lag, time_max_lag)
     # hideydecorations!(contributions_axis, ticks=false, ticklabels=false)
     # hidexdecorations!(contributions_axis)
     hideydecorations!(relative_contributions_axis, ticks=false, ticklabels=false)
@@ -51,12 +51,12 @@ fig3[1,2] = subfig3B = let freq = 0.12, θ=-2π, noise_amplitude = 0;
 
    # contributions_axis = CairoMakie.Axis(fig3)
     relative_contributions_axis = CairoMakie.Axis(fig3)
-    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_window, time_window)
+    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_max_lag, time_max_lag)
     raster_axis = CairoMakie.Axis(fig3)
     sublayout = GridLayout()
     title = Label(fig3, "phase shifting", tellheight=true, tellwidth=false)
     sublayout[:v] = [title, raster_axis, relative_contributions_axis]
-    # plot_network_class_contributions!(contributions_axis, raster, neuron_window, time_window)
+    # plot_network_class_contributions!(contributions_axis, raster, neuron_max_lag, time_max_lag)
     # hideydecorations!(contributions_axis, ticks=false, ticklabels=false)
     # hidexdecorations!(contributions_axis)
     hideydecorations!(relative_contributions_axis, ticks=false, ticklabels=false)
@@ -77,12 +77,12 @@ fig3[1,3] = subfigC = let freq = 0.12, θ=-0, noise_amplitude = 0;
 
    # contributions_axis = CairoMakie.Axis(fig3)
     relative_contributions_axis = CairoMakie.Axis(fig3)
-    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_window, time_window)
+    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_max_lag, time_max_lag)
     raster_axis = CairoMakie.Axis(fig3)
     sublayout = GridLayout()
     title = Label(fig3, "phase shifting", tellheight=true, tellwidth=false)
     sublayout[:v] = [title, raster_axis, relative_contributions_axis]
-    # plot_network_class_contributions!(contributions_axis, raster, neuron_window, time_window)
+    # plot_network_class_contributions!(contributions_axis, raster, neuron_max_lag, time_max_lag)
     # hideydecorations!(contributions_axis, ticks=false, ticklabels=false)
     # hidexdecorations!(contributions_axis)
     hideydecorations!(relative_contributions_axis, ticks=false, ticklabels=false)
@@ -102,13 +102,13 @@ subfig3D = let freq = 0.12, θ=0, noise_amplitude=0.5, signal_amplitude=0.5;
 
    # contributions_axis = CairoMakie.Axis(fig3)
     relative_contributions_axis = CairoMakie.Axis(fig3)
-    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_window, time_window)
+    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_max_lag, time_max_lag)
     raster_axis = CairoMakie.Axis(fig3)
     sublayout = GridLayout()
     title = Label(fig3, "SNR = 0dB", tellheight=true, tellwidth=false)
     sublayout[:v] = [title, raster_axis, relative_contributions_axis]
 
-    # plot_network_class_contributions!(contributions_axis, raster, neuron_window, time_window)
+    # plot_network_class_contributions!(contributions_axis, raster, neuron_max_lag, time_max_lag)
     # hideydecorations!(contributions_axis, ticks=false, ticklabels=false)
     # hidexdecorations!(contributions_axis)
     plot_raster!(raster_axis, raster)
@@ -127,13 +127,13 @@ subfig3E = let freq = 0.12, θ=0, noise_amplitude=2//3, signal_amplitude=1//3;
 
    # contributions_axis = CairoMakie.Axis(fig3)
     relative_contributions_axis = CairoMakie.Axis(fig3)
-    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_window, time_window)
+    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_max_lag, time_max_lag)
     raster_axis = CairoMakie.Axis(fig3)
     sublayout = GridLayout()
     title = Label(fig3, "SNR = -6dB", tellheight=true, tellwidth=false)
     sublayout[:v] = [title, raster_axis, relative_contributions_axis]
 
-    # plot_network_class_contributions!(contributions_axis, raster, neuron_window, time_window)
+    # plot_network_class_contributions!(contributions_axis, raster, neuron_max_lag, time_max_lag)
     # hideydecorations!(contributions_axis, ticks=false, ticklabels=false)
     # hidexdecorations!(contributions_axis)
     hideydecorations!(relative_contributions_axis, ticks=false, ticklabels=false)
@@ -154,13 +154,13 @@ subfig3F = let freq = 0.04, θ=0, noise_amplitude=1;
 
    # contributions_axis = CairoMakie.Axis(fig3)
     relative_contributions_axis = CairoMakie.Axis(fig3)
-    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_window, time_window)
+    plot_relative_network_class_contributions!(relative_contributions_axis, raster, potential_contributions, neuron_max_lag, time_max_lag)
     raster_axis = CairoMakie.Axis(fig3)
     sublayout = GridLayout()
     title = Label(fig3, "Noise", tellheight=true, tellwidth=false)
     sublayout[:v] = [title, raster_axis, relative_contributions_axis]
 
-    # plot_network_class_contributions!(contributions_axis, raster, neuron_window, time_window)
+    # plot_network_class_contributions!(contributions_axis, raster, neuron_max_lag, time_max_lag)
     # hideydecorations!(contributions_axis, ticks=false, ticklabels=false)
     # hidexdecorations!(contributions_axis)
     hideydecorations!(relative_contributions_axis, ticks=false, ticklabels=false)
@@ -181,7 +181,7 @@ label_F = fig3[2,3,TopLeft()] = Label(fig3, "F", font=noto_sans_bold, textsize=5
 
 fig3
 
-save(plotsdir("Fig3_$(neuron_window)x$(time_window)_$(Dates.now()).png"), fig3)
+save(plotsdir("Fig3_$(neuron_max_lag)x$(time_max_lag)_$(Dates.now()).png"), fig3)
 
 end
 end

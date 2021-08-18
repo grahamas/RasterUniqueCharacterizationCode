@@ -1,4 +1,4 @@
-spike_motif,n1,n2,t1,t2,connection_motif
+spike_motif,n1,n2,t1,t2,motif_class_num
 1,0,0,0,0,I
 2.1,0,0,0,1,II
 2.2,0,0,0,-1,II

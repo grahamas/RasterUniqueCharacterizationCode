@@ -1,5 +1,5 @@
-function name_classified_row(row)
-    (spike_motif=row[1],  n1=row[2], n2=row[3], t1=row[4], t2=row[5], connection_motif=row[6])
+function name_info_flow_row(row)
+    (spike_motif=row[1],  n1_num=row[2], n2_num=row[3], t1_num=row[4], t2_num=row[5], motif_class_num=row[6])
 end
 
 sign_str(x) = if x > 0
@@ -16,14 +16,15 @@ elseif abs(x1) > abs(x2)
 else
     "="
 end
-function prettify_row(row)
+
+function conditions_from_lag_nums(n1, t1, n2, t2)
     conditions = filter(x -> x != "", [
-        if sign_str(row.n1) == sign_str(row.n2) && row.n1 != 0
-            "\$\\abs{n_1} " * abs_rel_sym(row.n1, row.n2) * " \\abs{n_2}\$"
+        if sign_str(n1) == sign_str(n2) && n1 != 0
+            "\$\\abs{n_1} " * abs_rel_sym(n1, n2) * " \\abs{n_2}\$"
         else
             ""
-        end, if sign_str(row.t1) == sign_str(row.t2) && row.t1 != 0
-            "\$\\abs{t_1} " * abs_rel_sym(row.t1, row.t2) * " \\abs{t_2}\$"
+        end, if sign_str(t1) == sign_str(t2) && t1 != 0
+            "\$\\abs{t_1} " * abs_rel_sym(t1, t2) * " \\abs{t_2}\$"
         else
             ""
         end])
@@ -34,14 +35,22 @@ function prettify_row(row)
     else
         only(conditions)
     end
+    return conditions_str
+end
+
+function prettify_df(df)
+    DataFrame(prettify_row.(eachrow(df)))
+end
+
+function prettify_row(row)
     (
         spike_motif = row.spike_motif,
-        n1 = sign_str(row.n1),
-        n2 = sign_str(row.n2),
-        t1 = sign_str(row.t1),
-        t2 = sign_str(row.t2),
-        connection_motif = roman_encode(row.connection_motif),
-        conditions = conditions_str
+        n1 = sign_str(row.n1_num),
+        n2 = sign_str(row.n2_num),
+        t1 = sign_str(row.t1_num),
+        t2 = sign_str(row.t2_num),
+        motif_class = roman_encode(row.motif_class_num),
+        conditions = conditions_from_lag_nums(row.n1_num, row.t1_num, row.n2_num, row.t2_num)
     )
 end
 
@@ -64,8 +73,7 @@ function graphics_scaling_string(n_same_neurons, n_same_times)
 end
 
 function latexify(row::DataFrameRow)
-
-    row_contents = join(getproperty.(Ref(row), ["spike_motif", "n1", "n2", "t1", "t2", "conditions", "connection_motif"]), "&")
+    row_contents = join(getproperty.(Ref(row), ["spike_motif", "n1", "n2", "t1", "t2", "conditions", "motif_class"]), "&")
     row_contents *= "& \\adjustbox{padding=0em 0.5em 0em 0.5em, raise=-0.33\\height}{\\includegraphics{motif_figs/$(row.spike_motif).png}}"
     return row_contents
 end

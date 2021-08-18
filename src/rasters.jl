@@ -8,7 +8,8 @@ function write_raster(fn, arr)
     CSV.write(fn, tbl, header=false)
 end
 
-function random_raster(N_neurons, N_times, spike_prob=0.1)
-    putative_inputs = rand(N_neurons, N_times)
+function generate_random_raster(raster_size::Tuple, spike_prob=0.1)
+    putative_inputs = rand(Float64, raster_size)
     spikes = BitArray(putative_inputs .>= spike_prob)
 end
+

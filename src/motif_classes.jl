@@ -144,7 +144,7 @@ function _3_neuron_motif_classification(n1, n2, t1, t2)
     end
 end
 
-function classify_network_motif(n1, n2, t1, t2)
+function info_flow_classify_lag_motif_class(n1, n2, t1, t2)
     n_distinct_neurons = count_distinct(0, n1, n2)
 
     n1, n2, t1, t2 = if t1 < t2
@@ -244,7 +244,7 @@ function generate_classes_iterate_signs(nz_tup)
     return ordered_tups
 end
 
-function generate_all_motif_classes()
+function generate_all_lag_motif_classes()
     nonzero_indicators = [(n1, n2, t1, t2) for 
         t2 ∈ [false, true],
         t1 ∈ [false, true],
@@ -255,9 +255,9 @@ function generate_all_motif_classes()
     reduce(vcat, map(generate_classes_iterate_signs, labeled_nonzero_indicators))
 end
 
-function connectivity_classify_motif_classes(motif_classes::Vector{<:Tuple})
+function info_flow_classify_lag_motif_classes(motif_classes::Vector{<:Tuple})
     classified_motif_classes = map(motif_classes) do class_row
-        (class_row..., classify_network_motif(class_row[begin+1:end]...))
+        (class_row..., info_flow_classify_lag_motif_class(class_row[begin+1:end]...))
     end
 end
 

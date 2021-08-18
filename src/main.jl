@@ -1,6 +1,7 @@
 using DrWatson; quickactivate(@__DIR__)
 
-using CSV, Tables, DataFrames, IterTools
+using CSV, Tables, IterTools
+using DataFrames
 using LoopVectorization
 using CairoMakie
 using OffsetArrays
