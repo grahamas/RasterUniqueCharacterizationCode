@@ -8,8 +8,15 @@ function write_raster(fn, arr)
     CSV.write(fn, tbl, header=false)
 end
 
+function write_raster_coordinates(fn, arr)
+    coords = Tuple.(findall(arr))
+    df = DataFrame(coords)
+    rename!(df, ["Neuron", "Time"])
+    CSV.write(fn, df)
+end
+
 function generate_random_raster(raster_size::Tuple, spike_prob=0.1)
     putative_inputs = rand(Float64, raster_size)
-    spikes = BitArray(putative_inputs .>= spike_prob)
+    spikes = BitArray(putative_inputs .<= spike_prob)
 end
 

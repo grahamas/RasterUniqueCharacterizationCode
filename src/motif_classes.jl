@@ -185,7 +185,7 @@ function expand_plusminus(nz_tup)
     return if length(l_pm_tups) > 1
          [("$(tup[begin]).$i", tup[begin+1:end]...) for (i, tup) in enumerate(l_pm_tups)]
     else
-        l_pm_tups
+        [("$(tup[begin])", tup[begin+1:end]...) for (i, tup) in enumerate(l_pm_tups)]
     end
 end
 

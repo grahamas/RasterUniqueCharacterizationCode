@@ -3,6 +3,7 @@ name = "RasterUniqueCharacterizationCode"
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
 FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"

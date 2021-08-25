@@ -10,7 +10,7 @@ raster_signal = map(raster_coords) do (i_neuron, i_time)
     i_neuron % 10 == 1 ? (sin(2π*freq*i_time + θ*i_neuron/N_neurons) + 1) / 2 : 0
 end
 raster = BitArray(raster_signal .> 0.5)
-triple_correlation = calculate_unscaled_triple_correlation(raster, neuron_window, time_window)
+triple_correlation = _calculate_unscaled_triple_correlation(raster, neuron_window, time_window)
 
 TT = dropdims(mean(triple_correlation, dims=(1,2)), dims=(1,2))
 NN = dropdims(mean(triple_correlation, dims=(3,4)), dims=(3,4))
