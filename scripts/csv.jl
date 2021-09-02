@@ -12,7 +12,7 @@ lag_motif(ifr::InfoFlowRow) = LagMotif(lag_1(ifr), lag_2(ifr))
 let raster_size = (150, 150),
         λ_max = (7, 7),
         freq = 0.12, θ=0, noise_amplitude = 0, signal_amplitude=1,
-        spike_rate=0.5;
+        spike_rate=0.2;
     lag_classes = generate_all_lag_motif_classes()
     info_flow_classes = info_flow_classify_lag_motif_classes(lag_classes)
 
