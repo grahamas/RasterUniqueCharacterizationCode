@@ -2,8 +2,6 @@
 
 ## Matlab
 
-This code base is using Matlab (Mathworks). To reproduce this project, do the following: 
-
 All figures are made by running `triple_correlation_script.mat`.
 
    - Figure 1: no data (not reproduced by this code)
@@ -11,14 +9,19 @@ All figures are made by running `triple_correlation_script.mat`.
 
 ## Julia
 
-This code base is using the Julia Language and [DrWatson](https://juliadynamics.github.io/DrWatson.jl/stable/)
+Table S2 was generated using `generate_all_lag_motifs_for_table.jl` (sans diagrams, which were created manually). 
+
+Much of the Matlab code is replicated in Julia, though not used to make any figures.
+
+### Installing Julia codebase
+
+This code base uses the Julia Language and [DrWatson](https://juliadynamics.github.io/DrWatson.jl/stable/)
 to make a reproducible scientific project named
 > RasterUniqueCharacterizationCode
 
-To (locally) reproduce this project, do the following:
+To (locally) instantiate this julia code with its dependencies, do the following:
 
-0. Download this code base. Notice that raw data are typically not included in the
-   git-history and may need to be downloaded independently.
+0. Download this code base (e.g. via `git clone`).
 1. Open a Julia console and do:
    ```
    julia> using Pkg
@@ -27,5 +30,5 @@ To (locally) reproduce this project, do the following:
    julia> Pkg.instantiate()
    ```
 
-This will install all necessary packages for you to be able to run the scripts and
+This will install all necessary packages for you to be able to run the julia scripts and
 everything should work out of the box, including correctly finding local paths.
