@@ -22,11 +22,13 @@ end
 
 
 function calc_raster_coord(n0, t0, nl, tl, (n_raster_neurons, n_raster_times), neuron_max_lag, time_max_lag, max_contrib, raster_depth=0)
+    raster_neuron_lim = 8
+    raster_time_lim = 8
     n_neuron_lags, n_time_lags = (neuron_max_lag, time_max_lag) .* 2 .+ 1
-    time_lag_bins = (n_time_lags)^2-1
-    time_multiple = (time_lag_bins) / (n_raster_times-1) 
-    neuron_multiple = max_contrib / (n_raster_neurons-1) # If neuron=1, want coord=0; if neuron=9, want coord=50
-    ((t0+tl-1)*time_multiple, (n0+nl-1)*neuron_multiple, raster_depth)
+    time_lag_bin_max = (n_time_lags)^2
+    time_multiple = (time_lag_bin_max) / (raster_time_lim) 
+    neuron_multiple = max_contrib / (raster_neuron_lim) # If neuron=1, want coord=0; if neuron=9, want coord=50
+    ((t0+tl)*time_multiple, (n0+nl)*neuron_multiple, raster_depth)
 end
 
 function calc_accumulating_row(n0, t0, n1, t1, n2, t2, i_step, n_steps, raster, accumulated_lag_contrib, neuron_max_lag, time_max_lag, max_contrib=10)
@@ -54,79 +56,5 @@ function calc_accumulating_row(n0, t0, n1, t1, n2, t2, i_step, n_steps, raster, 
 end
 
 
-let fn = datadir("flow_illustration","manual_raster_7x7.csv"), neuron_max_lag=2,
-    time_max_lag=2
-    raster = load_raster(fn)
-
-    neuron_lag_range = -(neuron_max_lag):(neuron_max_lag)        
-    time_lag_range = -(time_max_lag):(time_max_lag)
-
-    (N_neurons, N_times) = size(raster)
-    time_range = (0-minimum(time_lag_range)):(N_times-1-maximum(time_lag_range))
-    neuron_range = (1-minimum(neuron_lag_range)):(N_neurons-maximum(neuron_lag_range))
-
-    accumulated_lag_contrib = zeros(Int, neuron_lag_range, time_lag_range, neuron_lag_range, time_lag_range)
-
-    @warn "Looping $(length(neuron_range)*length(time_range)*length(neuron_lag_range)^2*length(time_lag_range)^2) times..."
-    
-    step_points = [
-        (location=(3,2), lag=(2,0,1,1)),
-        (location=(3,2), lag=(0,0,0,0)),
-        (location=(5,2), lag=(-1,1,-2,0))
-    ]
-    post_step_points = length(step_points) + 1
-    header = vcat(
-        ["n", "t", "n1", "t1", "n2", "t2", "node"],
-        [
-            vcat(
-                [
-                    ["$(name)_x", "$(name)_y", "$(name)_z"] 
-                    for name ∈ ["raster_$(SP)", "counts_$(SP)"]
-                ]...
-            ) for SP in 1:post_step_points
-        ]...
-    )
-    push!(header, "appearance")
-    push!(header, "Motif")
-    header_tuple = Symbol.(tuple(header...))
-    rows = NTuple{length(header_tuple),Union{Float64,String}}[]
-    for (step_num, step_point) ∈ enumerate(step_points)
-        @unpack location, lag = step_point
-        n1, t1, n2, t2 = lag
-        raster[location...]*raster[(location .+ (n1,t1))...]*raster[(location .+ (n2,t2))...] == 0 && @warn "Non-extant triplet: $step_point"
-        triplet_rows = calc_accumulating_row(location..., n1, t1, n2, t2,
-                            step_num, post_step_points, raster, 
-                            accumulated_lag_contrib,
-                            neuron_max_lag, time_max_lag)
-        rows = vcat(rows, triplet_rows)
-    end
-    @show neuron_range, time_range
-    for i_neuron ∈ neuron_range, i_time ∈ time_range
-        # sub-optimal loop nesting for storytelling purposes
-        if raster[i_neuron, i_time] != 0
-            row_triples = [calc_accumulating_row(i_neuron, i_time, n1, t1, n2, t2, 
-                                        post_step_points, post_step_points,
-                                        raster, accumulated_lag_contrib,
-                                        neuron_max_lag, time_max_lag
-                                    ) 
-                            for n1 ∈ neuron_lag_range, n2 ∈ neuron_lag_range,
-                                t1 ∈ time_lag_range, t2 ∈ time_lag_range
-                            if (location=(i_neuron, i_time), lag=(n1, t1, n2, t2)) ∉ step_points
-            ]
-            rows = vcat(rows, row_triples...)
-        end
-    end
-
-    nts = map(rows) do row
-        NamedTuple{header_tuple}(row)
-    end
-    df = DataFrame(nts)
-
-    base_nodes_arr = base_nodes_raster(raster, neuron_max_lag, time_max_lag)
-    write_raster_coordinates(datadir("flow_illustration", "base_nodes_raster_7x7.csv"), base_nodes_arr)
-
-    write_spike_trains(datadir("flow_illustration", "spike_trains_7x7.csv"), raster)
-    write_raster_coordinates(datadir("flow_illustration", "raster_7x7.csv"), raster)
-    CSV.write(datadir("flow_illustration", "illustrated_7x7.csv"), df)
-end
-
+include("illustration_7x7.jl")
+include("results_30x30.jl")

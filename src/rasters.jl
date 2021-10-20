@@ -1,6 +1,10 @@
 function make_neuron_raster(dims...)
     arr = BitArray(undef, dims...)
     arr .= 0
+    make_neuron_raster(arr)
+end
+function make_neuron_raster(arr::BitMatrix)
+    dims = size(arr)
     OffsetArray(arr, [1:dim for dim in dims[begin:end-1]]..., 0:(dims[end]-1))
 end
 
@@ -20,6 +24,9 @@ function write_raster_coordinates(fn, arr::OffsetArray)
     df = DataFrame(time_zeroed_coords)
     rename!(df, ["Neuron", "Time"])
     CSV.write(fn, df)
+end
+function write_raster_coordinates(fn, arr::BitMatrix)
+    write_raster_coordinates(fn, make_neuron_raster(arr))
 end
 
 function generate_random_raster(raster_size::Tuple, spike_prob=0.1)

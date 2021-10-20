@@ -59,6 +59,7 @@ function _calculate_scaled_triple_correlation(raster::BitMatrix, λ_max::Tuple)
     unscaled_correlation = _calculate_unscaled_triple_correlation(raster, λ_max)
     unscaled_correlation ./= calculate_scaling_factor(raster, λ_max)
 end
+_calculate_scaled_triple_correlation(raster::OffsetArray, args...) = _calculate_scaled_triple_correlation(parent(raster), args...)
 
 function calculate_scaling_factor(raster, λ_max)
     N, T = size(raster)
@@ -113,6 +114,9 @@ function triple_correlation_network_classifications(raster::BitMatrix, neuron_ma
     triple_correlation_class_contributions!(network_class_contributions, raster, neuron_max_lag, time_max_lag, lags_classifier)
 end
 
+function triple_correlation_network_classifications(raster::OffsetArray, args...)
+    triple_correlation_network_classifications(parent(raster), args...)
+end
 
 
 ####### High dimensional fallback #######
