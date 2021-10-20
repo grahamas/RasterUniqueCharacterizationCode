@@ -38,6 +38,13 @@ for n=1:R;
     end;
 end;
 
+% create all-firing raster (Fig 2E)
+% for n=1:R;
+%     for t=1:C;    
+%         p(n,t)=1;
+%     end;
+% end;
+
 % Only analyze part of the image
 % determined by Rr and Cr
 T1=7; 
@@ -95,6 +102,19 @@ xlim([0 Cr])
 axis('off')
 box off
 set(gcf,'Position',[406   101   869   719])
+
+figure; hold on;
+hold on;
+bar(potential,'k')
+set(gca, 'YScale', 'log')
+xlim([0 15]);
+xticks([1 5 10 14])
+xticklabels({'I','V','X','XIV'})
+xlabel('Motif-Class #')
+ylabel('Number of Triplets (Scaled Count)')
+title('Potential Contributions')
+ylim([10e-2 10e4])
+set(gca,'YMinorTick','Off')
 
 figure; hold on; 
 stem(actual_potential_ratio,'bo','LineWidth',7)
