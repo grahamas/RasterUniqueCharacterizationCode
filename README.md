@@ -9,7 +9,7 @@ All figures and results in Deshpande, Smith, & van Drongelen (2021, submitted; [
 
 Table S2 was generated using the [Julia](https://julialang.org/) script `generate_all_lag_motifs_for_table.jl` (sans diagrams, which were created manually). 
 
-Much of the Matlab code is replicated in Julia, though no Julia code was used to make any of the figures that appear in any published manuscript. To use the Julia part of this codebase (assuming [Julia v1.5+ is already installed](https://julialang.org/downloads/))
+Much of the Matlab code is replicated in Julia, though no Julia code was used to make any of the figures that appear in any published manuscript. To use the Julia part of this codebase (assuming [Julia v1.5+ is already installed](https://julialang.org/downloads/)):
 
 0. Download this code base (e.g. via `git clone`).
 1. Open a Julia console and do:
