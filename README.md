@@ -9,7 +9,7 @@ All figures and results were created using Matlab (Mathworks), and can be replic
 
 Table S2 was generated using the Julia script `generate_all_lag_motifs_for_table.jl` (sans diagrams, which were created manually). 
 
-Much of the Matlab code is replicated in Julia, though not used to make any figures. To use the Julia part of this codebase (assuming Julia v1.5+ is already installed)
+Much of the Matlab code is replicated in Julia, though not used to make any of the figures that appear in any published manuscript. To use the Julia part of this codebase (assuming Julia v1.5+ is already installed)
 
 0. Download this code base (e.g. via `git clone`).
 1. Open a Julia console and do:
