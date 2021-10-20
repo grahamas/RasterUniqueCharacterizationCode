@@ -4,7 +4,7 @@
 
 This code base is using Matlab (Mathworks). To reproduce this project, do the following: 
 
-All figures are made by running `triple_correlation_script.mat` with various parameters
+All figures are made by running `triple_correlation_script.mat`.
 
    - Figure 1: no data (not reproduced by this code)
    - Figures 2-3: Run code as is
