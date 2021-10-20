@@ -5,19 +5,11 @@ All figures and results were created using Matlab (Mathworks), and can be replic
    - Figure 1: no data (not reproduced by this code)
    - Figures 2-3: Run `triple_correlation_script.mat` in Matlab
 
-## Julia
+### Julia
 
 Table S2 was generated using `generate_all_lag_motifs_for_table.jl` (sans diagrams, which were created manually). 
 
-Much of the Matlab code is replicated in Julia, though not used to make any figures.
-
-### Installing Julia codebase
-
-This code base uses the Julia Language and [DrWatson](https://juliadynamics.github.io/DrWatson.jl/stable/)
-to make a reproducible scientific project named
-> RasterUniqueCharacterizationCode
-
-To (locally) instantiate this julia code with its dependencies, do the following:
+Much of the Matlab code is replicated in Julia, though not used to make any figures. To use the Julia part of this codebase (assuming Julia v1.5+ is already installed)
 
 0. Download this code base (e.g. via `git clone`).
 1. Open a Julia console and do:
@@ -28,5 +20,5 @@ To (locally) instantiate this julia code with its dependencies, do the following
    julia> Pkg.instantiate()
    ```
 
-This will install all necessary packages for you to be able to run the julia scripts and
+This will install all necessary packages for you to be able to run the Julia scripts and
 everything should work out of the box, including correctly finding local paths.
