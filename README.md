@@ -1,6 +1,6 @@
 # RasterUniqueCharacterizationCode
 
-All figures and results in Deshpande, Smith, & van Drongelen (2020; submitted; [preprint](https://www.biorxiv.org/content/10.1101/2021.08.16.456546v1)*)were created using [Matlab (Mathworks)](https://www.mathworks.com/products/matlab.html), and can be replicated by running `triple_correlation_script.mat` in the `scripts` directory.
+All figures and results in Deshpande, Smith, & van Drongelen (2021, submitted; [preprint](https://www.biorxiv.org/content/10.1101/2021.08.16.456546v1)*)were created using [Matlab (Mathworks)](https://www.mathworks.com/products/matlab.html), and can be replicated by running `triple_correlation_script.mat` in the `scripts` directory.
 
    - Figure 1: no data (not reproduced by this code)
    - Figures 2-3: Run `triple_correlation_script.mat` in Matlab
