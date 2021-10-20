@@ -1,15 +1,15 @@
 # RasterUniqueCharacterizationCode
 
-All figures and results were created using Matlab (Mathworks), and can be replicated by running `triple_correlation_script.mat` in the `scripts` directory.
+All figures and results were created using [Matlab (Mathworks)](https://www.mathworks.com/products/matlab.html), and can be replicated by running `triple_correlation_script.mat` in the `scripts` directory.
 
    - Figure 1: no data (not reproduced by this code)
    - Figures 2-3: Run `triple_correlation_script.mat` in Matlab
 
 ### Julia
 
-Table S2 was generated using the Julia script `generate_all_lag_motifs_for_table.jl` (sans diagrams, which were created manually). 
+Table S2 was generated using the [Julia](https://julialang.org/) script `generate_all_lag_motifs_for_table.jl` (sans diagrams, which were created manually). 
 
-Much of the Matlab code is replicated in Julia, though not used to make any of the figures that appear in any published manuscript. To use the Julia part of this codebase (assuming Julia v1.5+ is already installed)
+Much of the Matlab code is replicated in Julia, though not used to make any of the figures that appear in any published manuscript. To use the Julia part of this codebase (assuming [Julia v1.5+ is already installed](https://julialang.org/downloads/))
 
 0. Download this code base (e.g. via `git clone`).
 1. Open a Julia console and do:
