@@ -1,11 +1,9 @@
 # RasterUniqueCharacterizationCode
 
-## Matlab
-
-All figures are made by running `triple_correlation_script.mat`.
+All figures and results were created using Matlab (Mathworks), and can be replicated by running `triple_correlation_script.mat` in the `scripts` directory.
 
    - Figure 1: no data (not reproduced by this code)
-   - Figures 2-3: Run code as is
+   - Figures 2-3: Run code as-is
 
 ## Julia
 
