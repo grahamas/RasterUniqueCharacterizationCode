@@ -8,10 +8,10 @@ All figures are made by running `triple_correlation_script.mat` with various par
 
    - Figure 1: no data (not reproduced by this code)
    - Figure 2A: run code as is
-   - Figure 2B: 
+   - Figure 2B: run code as is
    - Figure 2C-D: Change noise scaling factor in Line 27 to 1 and signal scaling factor to 0, and run the code
    - Figure 2E-F: Comment Lines 30-39, uncomment lines 41-46, and run the code
-   - Figure 2G-H: 
+   - Figure 2G-H: run code as is
    - Figure 3A: Change frequency (f) in line 11 to f = 0.12, and run the code
    - Figure 3B: Uncomment line 19, comment line 20 for the phase shift, uncomment line 99, and run the code
    - Figure 3C: Change the noise scaling factor to 1, uncomment line 28, and run the code
