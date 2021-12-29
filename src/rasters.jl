@@ -31,7 +31,7 @@ end
 
 function generate_random_raster(raster_size::Tuple, spike_prob=0.1)
     putative_inputs = rand(Float64, raster_size)
-    spikes = BitArray(putative_inputs .<= spike_prob)
+    BitArray(putative_inputs .<= spike_prob)
 end
 
 function write_spike_trains(fn, arr)
