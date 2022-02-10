@@ -76,9 +76,34 @@ end
 function plot_raster!(ax, raster::BitMatrix)
     plt = heatmap!(ax, raster', colormap=:binary)
     hidedecorations!(ax)
-    ax.aspect = DataAspect()
-    ax.tellheight = true
+    #ax.tellheight = true
     ax.bottomspinevisible = false
     ax.leftspinevisible = false
-    plt
+    ax.topspinevisible = false
+    ax.rightspinevisible = false
+    ax.autolimitaspect = 1/3
+end
+
+using Distributions
+function rand_spike_train(λ::Number, n_bins)
+    train = zeros(Int, n_bins)
+    train .= 0
+    rand_spike_train!(train, λ)
+    return train
+end
+function rand_spike_train!(train, λ)
+    n_bins = length(train)
+    next = ceil(Int, rand(Exponential(1/λ)))
+    while next <= n_bins
+        train[next] = 1
+        next += ceil(Int, rand(Exponential(1/λ)))
+    end
+end
+
+function rand_raster(λ, n_channels, n_bins)
+    raster = zeros(Int, n_channels, n_bins)
+    for i_ch ∈ 1:n_channels
+        @views rand_spike_train!(raster[i_ch, :], λ)
+    end
+    return raster
 end

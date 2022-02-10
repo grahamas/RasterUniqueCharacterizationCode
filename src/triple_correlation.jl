@@ -48,7 +48,7 @@ end
 
 
 function _calculate_unscaled_triple_correlation(raster::BitMatrix, λ_max::Tuple)
-    λ_ranges = Tuple(repeat([-l:l for l ∈ λ_max], outer=(2,)))
+    λ_ranges = Tuple(repshoweat([-l:l for l ∈ λ_max], outer=(2,)))
     correlation = zeros(Float64, λ_ranges)
 
     _calculate_unscaled_triple_correlation!(correlation, raster, λ_max)
