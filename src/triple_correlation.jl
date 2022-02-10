@@ -75,50 +75,6 @@ function n_triplets(n1, t1, n2, t2, N, T)
 end
 
 
-
-
-
-
-
-
-
-####### Special Cases ##########
-
-function triple_correlation_class_contributions!(class_contribution::Vector, raster::BitMatrix, neuron_max_lag, time_max_lag, lags_classifier::Function)
-    neuron_lag_range = -(neuron_max_lag):(neuron_max_lag)        
-    time_lag_range = -(time_max_lag):(time_max_lag)
-
-    (N_neurons, N_times) = size(raster)
-    time_range = (1-minimum(time_lag_range)):(N_times-maximum(time_lag_range))
-    neuron_range = (1-minimum(neuron_lag_range)):(N_neurons-maximum(neuron_lag_range))
-
-    class_contribution .= 0
-
-    @turbo for n1 ∈ neuron_lag_range, n2 ∈ neuron_lag_range, 
-            t1 ∈ time_lag_range, t2 ∈ time_lag_range
-        class = lags_classifier(n1, n2, t1, t2)
-        contribution = 0
-        for i_neuron ∈ neuron_range, i_time ∈ time_range #(i_neuron, i_time) ∈ IterTools.product(neuron_range, time_range)
-            contribution += raster[i_neuron, i_time] * raster[i_neuron+n1,i_time+t1] * raster[i_neuron+n2,i_time+t2]
-        end
-        class_contribution[class] += contribution
-    end
-    return class_contribution ./ calculate_scaling_factor(raster, (neuron_max_lag, time_max_lag))
-end
-
-function triple_correlation_network_classifications(raster::BitMatrix, neuron_max_lag, time_max_lag)
-    N_network_classifications = 14
-    network_class_contributions = Array{Int}(undef, N_network_classifications)
-    lags_classifier = info_flow_classify_lag_motif_class
-
-    triple_correlation_class_contributions!(network_class_contributions, raster, neuron_max_lag, time_max_lag, lags_classifier)
-end
-
-function triple_correlation_network_classifications(raster::OffsetArray, args...)
-    triple_correlation_network_classifications(parent(raster), args...)
-end
-
-
 ####### High dimensional fallback #######
 
 
