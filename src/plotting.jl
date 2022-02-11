@@ -81,7 +81,7 @@ function plot_raster!(ax, raster::BitMatrix)
     ax.leftspinevisible = false
     ax.topspinevisible = false
     ax.rightspinevisible = false
-    ax.autolimitaspect = 1/3
+    ax.autolimitaspect = 1.
 end
 
 using Distributions

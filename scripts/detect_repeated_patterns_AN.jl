@@ -3,13 +3,14 @@
 using TripleCorrelations
 using HypothesisTests, Random, Statistics
 using ProgressMeter
-using GLMakie
+using CairoMakie
 using Dates
 using Memoize
+using Pkg
 
 #defines motif_examples dict
-include(joinpath(homedir(),"git", "TripleCorrelations", "test", "data", "motif_examples.jl"))
-include(joinpath(homedir(), "git", "TripleCorrelations", "test", "src", "helpers.jl"))
+include(joinpath(Pkg.devdir(), "TripleCorrelations", "test", "data", "motif_examples.jl"))
+include(joinpath(Pkg.devdir(), "TripleCorrelations", "test", "src", "helpers.jl"))
 include("../src/roman_encode.jl")
 
 if !@isdefined(an_timeseries_dict) || force_redef
@@ -74,7 +75,7 @@ end
 
 
 motif_class_num = 5
-boundary = ZeroPadded()
+boundary = Periodic()
 motif_class = roman_encode(motif_class_num)
 an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_class,boundary)] = let n_pad = 10, t_pad = 30, 
     n_reps = 1, t_reps = 1,

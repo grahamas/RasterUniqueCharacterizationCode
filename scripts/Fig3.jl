@@ -7,7 +7,7 @@ fig3 = Figure(resolution=(1600, 2400))
 
 let N_neurons = 150, N_times = 150,
         neuron_max_lag = 7, time_max_lag = 7,
-        boundary = ZeroPadded();
+        boundary = Periodic();
 all_ones_raster = BitArray(ones(N_neurons, N_times))
 potential_contributions = sequence_class_tricorr_unrolled(
     all_ones_raster, boundary, neuron_max_lag, time_max_lag
