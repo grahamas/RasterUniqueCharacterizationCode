@@ -8,9 +8,9 @@ using GLMakie
 using Memoization
 
 #defines motif_examples dict
-include("../../TripleCorrelations/test/data/motif_examples.jl")
-include("../../TripleCorrelations/test/src/helpers.jl")
-include("../src/roman_encode.jl")
+include("../../../TripleCorrelations/test/data/motif_examples.jl")
+include("../../../TripleCorrelations/test/src/helpers.jl")
+include("../../src/roman_encode.jl")
 
 if !@isdefined(an_top_timeseries_dict)
     an_top_timeseries_dict = Dict()
@@ -20,15 +20,30 @@ if !@isdefined(peristimulus_an_top_results_dict)
     peristimulus_an_top_results_dict = Dict()
 end
 
-
-
 @memoize function cached_binary_bootstrapped_contribution(n::Int, t::Int, n_lag::Int, t_lag::Int, n_ones::Int, n_bootstrap::Int=10)
     unshuffled_raster = zeros(Int, n, t)
     unshuffled_raster[1:n_ones] .= 1
-    sum(
+    bootstrap_tricorr = sum(
         sequence_class_tricorr(shuffle(unshuffled_raster), n_lag, t_lag) 
             for _ ∈ 1:n_bootstrap
-    ) ./ n_bootstrap
+    )
+    bootstrap_tricorr ./= n_bootstrap
+    return bootstrap_tricorr
+end
+
+
+@memoize function cached_nonzero_binary_bootstrapped_contribution(n::Int, t::Int, n_lag::Int, t_lag::Int, n_ones::Int, n_bootstrap::Int=10, bootstrap_step::Int=5)
+    cached_binary_bootstrapped_contribution(n, t, n_lag, t_lag, n_ones, n_bootstrap)
+    while any(bootstrap_tricorr .== 0)
+        @warn "n_bootstrap = $n_bootstrap insufficient [(n,t) = $((n,t)); lag = ($(n_lag,t_lag))]"
+        n_bootstrap += bootstrap_step
+        bootstrap_tricorr += sum(
+            sequence_class_tricorr(shuffle(unshuffled_raster), n_lag, t_lag) 
+                for _ ∈ 1:bootstrap_step
+        )
+    end
+    bootstrap_tricorr ./= n_bootstrap
+    return bootstrap_tricorr
 end
 
 
@@ -47,28 +62,10 @@ function make_an_timeseries(raster, n_lag, t_lag, t_step; t_window=2t_lag+1, n_b
     end
 end
 
-function test_peristimulus_difference(l_timeseries, motif_class_num, start, stop)
-    peristimulus = vcat([[contribs[motif_class_num] for contribs ∈ timeseries[start:stop]] for timeseries ∈ l_timeseries]...)
-    nonstimulus = vcat([[contribs[motif_class_num] for contribs ∈ [timeseries[begin:start-1]; timeseries[stop+1:end]]] for timeseries ∈ l_timeseries]...)
-    effect_size = mean(peristimulus) - mean(nonstimulus)
-    significance = pvalue(MannWhitneyUTest(peristimulus, nonstimulus))
-    return (effect_size=effect_size, significance=significance)
-end
-
 function get_motif_t_bounds(motif_class)
     triplet = motif_examples[motif_class]
     time_collapsed = dropdims(sum(triplet, dims=1), dims=1)
     (findfirst(time_collapsed .> 0), findlast(time_collapsed .> 0))
-end
-
-
-function calculate_peristimulus_window(t_pad, t_window, t_step, motif_t_start, motif_t_stop, motif_total_width=3)
-    total_length = 2t_pad + motif_total_width
-    start_dxs = 1:t_step:(total_length - t_pad)
-    stop_dxs = (1+t_window):t_step:total_length
-    first_touch = findfirst(stop_dxs .>= (t_pad + motif_t_stop)) # Must have entire motif
-    last_touch = findlast(start_dxs .<= (t_pad + motif_t_start))
-    return (first_touch+1, last_touch-1)
 end
 
 motif_class_num = 5
