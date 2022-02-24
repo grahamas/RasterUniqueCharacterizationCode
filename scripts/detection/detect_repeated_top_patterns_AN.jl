@@ -82,5 +82,7 @@ save(plotsdir(subdir,"motif_top_AN_$(typeof(boundary))_timeseries_$(motif_class)
 save(plotsdir(subdir,"motif_XIV_top_AN_$(typeof(boundary))_timeseries_given_$(motif_class).png"), f_motif_control)
 
 (l_an_timeseries, peristimulus_results)
+end
+
 end;
 
