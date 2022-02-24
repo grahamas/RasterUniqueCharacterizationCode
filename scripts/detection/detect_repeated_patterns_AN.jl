@@ -32,8 +32,7 @@ force_redef = false
 boundary = Periodic()
 for motif_class_num = 1:14
 motif_class = roman_encode(motif_class_num)
-an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_class,boundary)] = let  boundary = Periodic(),
-    n_pad = 10, t_pad = 30, 
+an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_class,boundary)] = let n_pad = 10, t_pad = 30, 
     n_reps = 1, t_reps = 1,
     n_lag = 6, t_lag = 5,
     trials=200, t_step=2,
@@ -67,9 +66,9 @@ end
 noise_raster = rand(size(signal_raster)...) .< noise_rate
 raster = min.(signal_raster .+ noise_raster, 1)
 
-f_signal = heatmap(signal_raster')
-f_noise = heatmap(noise_raster')
-f_raster = heatmap(raster')
+f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
+f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
+f_raster = heatmap(raster', axis=(xlabel="time", ylabel="neuron"))
 
 mkpath(plotsdir(subdir))
 
@@ -77,8 +76,8 @@ save(plotsdir(subdir,"signal_motif_AN_$(typeof(boundary))_$(motif_class).png"), 
 save(plotsdir(subdir,"noise_motif_AN_$(typeof(boundary))_$(motif_class).png"), f_noise)
 save(plotsdir(subdir,"raster_motif_AN_$(typeof(boundary))_$(motif_class).png"), f_raster)
 
-f_motif_course = plot([a[motif_class_num] for a ∈ mean(l_an_timeseries)])
-f_motif_control = plot([a[14] for a ∈ mean(l_an_timeseries)])
+f_motif_course = plot([a[motif_class_num] for a ∈ mean(l_an_timeseries)], axis=(xlabel="time", ylabel="avg motif $(motif_class) contrib"))
+f_motif_control = plot([a[14] for a ∈ mean(l_an_timeseries)], axis=(xlabel="time", ylabel="avg motif XIV contrib"))
 
 save(plotsdir(subdir,"motif_AN_$(typeof(boundary))_timeseries_$(motif_class).png"), f_motif_course)
 save(plotsdir(subdir,"motif_XIV_AN_$(typeof(boundary))_timeseries_given_$(motif_class).png"), f_motif_control)
