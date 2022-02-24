@@ -15,7 +15,7 @@ fig = @time with_theme(bar_theme) do
     fig
 end
 
-save(plotsdir("potential_contributions_$(transform != identity ? string(transform) * "_" : "")lag$(max_lag)_$(Dates.now()).png"), fig)
+save(plotsdir("potential_contributions_$(transform != identity ? string(transform) * "_" : "")lag$(max_lag)_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS")).png"), fig)
 
 fig
 

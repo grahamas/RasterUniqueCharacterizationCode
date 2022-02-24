@@ -53,7 +53,7 @@ function calculate_peristimulus_window(t_pad, t_window, t_step, motif_t_start, m
     return (first_touch+1, last_touch-1)
 end
 
-
+boundary = Periodic()
 motif_class_num = 3
 motif_class = roman_encode(motif_class_num)
 a_timeseries_dict[motif_class], peristimulus_a_results_dict[motif_class] = let n_pad = 10, t_pad = 30, 
@@ -61,12 +61,11 @@ a_timeseries_dict[motif_class], peristimulus_a_results_dict[motif_class] = let n
     n_lag = 6, t_lag = 5,
     snippets=500, t_step=2,
     t_window = 2t_lag + 1,
-    noise_rate = 0.2, noise_calcs=2,
-    boundary=Periodic();
+    noise_rate = 0.2, noise_calcs=2;
 subdir = if boundary isa Periodic
-    "A_periodic_$(motif_class)_$(Dates.now())"
+    "A_periodic_$(motif_class)_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa ZeroPadded
-    "A_zeropad_$(motif_class)_$(Dates.now())"
+    "A_zeropad_$(motif_class)_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 else
     error("Unrecognized boundary condition for TriCorr")
 end

@@ -182,7 +182,7 @@ label_F = fig3[2,3,TopLeft()] = Label(fig3, "F", font=noto_sans_bold, textsize=5
 
 fig3
 
-save(plotsdir("Fig3_$(boundary |> typeof)_$(neuron_max_lag)x$(time_max_lag)_$(Dates.now()).png"), fig3)
+save(plotsdir("Fig3_$(boundary |> typeof)_$(neuron_max_lag)x$(time_max_lag)_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS")).png"), fig3)
 
 end
 end
