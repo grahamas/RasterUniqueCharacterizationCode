@@ -17,7 +17,7 @@ let raster_size = (150, 150),
     info_flow_classes = info_flow_classify_lag_motif_classes(lag_classes)
 
     random_raster = generate_random_raster(raster_size, spike_rate)
-    potential_raster = BitArray(ones(Bool, raster_size))
+    potential_raster = Array{Bool}(ones(Bool, raster_size))
     raster_coords = IterTools.product(1:raster_size[1], 1:raster_size[2])
     raster_signal = map(raster_coords) do (i_neuron, i_time)
         (sin(2π*freq*i_time + θ) + 1) / 2

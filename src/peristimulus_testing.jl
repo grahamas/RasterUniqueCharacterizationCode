@@ -34,11 +34,13 @@ function make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; t_window=2t_
 end
 
 function detect_an_across_trials(signal_raster, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
-
-    @showprogress map(1:trials) do _
+    trialavg_raster = zeros(Float64, size(signal_raster)...)
+    l_an_timeseries = @showprogress map(1:trials) do _
         noise_raster = rand(size(signal_raster)...) .< noise_rate
-        raster = (signal_raster .+ noise_raster) .> 0
+        raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
+        trialavg_raster += raster
         make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; n_bootstraps=n_bootstraps)
     end
-
+    trialavg_raster ./= trials
+    return (l_an_timeseries, trialavg_raster)
 end

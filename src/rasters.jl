@@ -1,5 +1,5 @@
 function make_neuron_raster(dims...)
-    arr = BitArray(undef, dims...)
+    arr = Array{Bool}(undef, dims...)
     arr .= 0
     make_neuron_raster(arr)
 end
@@ -9,7 +9,7 @@ function make_neuron_raster(arr::BitMatrix)
 end
 
 function load_raster(fn)
-    arr = CSV.read(fn, BitArray ∘ Tables.matrix, delim=",", header=false)
+    arr = CSV.read(fn, Array{Bool} ∘ Tables.matrix, delim=",", header=false)
     return OffsetArray(arr, 1:size(arr,1), 0:(size(arr,2)-1))
 end
 
@@ -31,7 +31,7 @@ end
 
 function generate_random_raster(raster_size::Tuple, spike_prob=0.1)
     putative_inputs = rand(Float64, raster_size)
-    BitArray(putative_inputs .<= spike_prob)
+    Array{Bool}(putative_inputs .<= spike_prob)
 end
 
 function write_spike_trains(fn, arr)
