@@ -4,7 +4,7 @@ using TripleCorrelations
 using HypothesisTests, Random, Statistics
 Random.seed!(1234)
 using ProgressMeter
-using CairoMakie
+using CairoMakie; plot_ext = "png"
 using Dates
 using Pkg
 
