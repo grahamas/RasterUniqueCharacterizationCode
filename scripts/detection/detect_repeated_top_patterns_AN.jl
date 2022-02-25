@@ -23,7 +23,6 @@ if !@isdefined(detect_top_an_across_trials) || force_redef
     @memoize function detect_top_an_across_trials(motif_class, n_pad, t_pad, n_reps, t_reps, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
         signal_raster = TripleCorrelations.repeat_padded_top_motif(motif_class, n_pad, t_pad, n_reps, t_reps)
         l_an_timeseries, trialavg_raster = detect_an_across_trials(signal_raster, trials,noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
-        l_an_timeseries, l_trialavgs
         return (l_an_timeseries, signal_raster, trialavg_raster)
     end
 end
