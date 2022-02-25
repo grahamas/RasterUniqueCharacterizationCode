@@ -24,6 +24,14 @@ function calculate_peristimulus_window(t_pad, t_window, t_step, motif_t_start, m
     return (first_touch+1, last_touch-1)
 end
 
+function calculate_jitter_peristimulus_window(t_jitter, t_window, t_step, motif_t_target)
+    window_start_dxs = 1:t_step:motif_t_target
+    window_stop_dxs = (1+t_window):t_step:motif_t_target+t_jitter
+    first_touch = findfirst(window_stop_dxs .>= (motif_t_target - t_jitter)) # Must have entire motif
+    last_touch = findlast(window_start_dxs .<= (motif_t_target + t_jitter))
+    return (first_touch, last_touch)
+end
+
 function make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; t_window=2t_lag+1, n_bootstraps)
     N,T = size(raster)
     map(1:t_step:(T-t_window)) do t_start
@@ -33,9 +41,31 @@ function make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; t_window=2t_
     end
 end
 
-function detect_an_across_trials(signal_raster, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+function detect_an_across_trials(signal_raster::Array, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
     trialavg_raster = zeros(Float64, size(signal_raster)...)
     l_an_timeseries = @showprogress map(1:trials) do _
+        noise_raster = rand(size(signal_raster)...) .< noise_rate
+        raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
+        trialavg_raster += raster
+        make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; n_bootstraps=n_bootstraps)
+    end
+    trialavg_raster ./= trials
+    return (l_an_timeseries, trialavg_raster)
+end
+
+function embedded_rand_motif(motif_class, n_size, t_size, n0_range::AbstractArray, t0_range::AbstractArray, n_max_jitter, t_max_jitter)
+    raster = zeros(Bool, n_size, t_size)
+    motif_coords = TripleCorrelations.rand_motif(motif_class, n0_range, t0_range, n_max_jitter, t_max_jitter)
+    for motif_coord in motif_coords
+        raster[CartesianIndex((motif_coord .+ (n_size ÷ 2, t_size ÷ 2)) .% (n_size, t_size) .+ (1, 1))] = 1
+    end
+    return raster
+end
+
+@memoize function detect_an_across_jittered_trials(motif_class::String, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+    trialavg_raster = zeros(Float64, n_size, t_size)
+    l_an_timeseries = @showprogress map(1:trials) do _
+        signal_raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
         noise_raster = rand(size(signal_raster)...) .< noise_rate
         raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
         trialavg_raster += raster

@@ -18,10 +18,19 @@ if !@isdefined(peristimulus_an_results_dict) || force_redef
     peristimulus_an_results_dict = Dict()
 end
 
-if !@isdefined(detect_mid_an_across_trials) || force_redef
-@memoize function detect_mid_an_across_trials(motif_class, n_pad, t_pad, n_reps, t_reps, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
-    signal_raster = TripleCorrelations.repeat_padded_motif(motif_class, n_pad, t_pad, n_reps, t_reps)
-    l_an_timeseries, trialavg_raster = detect_an_across_trials(signal_raster, trials,noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+function embedded_static_rand_motif(motif_class, n_size, t_size, n_max_jitter, t_max_jitter)
+    raster = zeros(Bool, n_size, t_size)
+    motif_coords = TripleCorrelations.rand_motif(motif_class, 0:0, 0:0, n_max_jitter, t_max_jitter)
+    for motif_coord in motif_coords
+        raster[CartesianIndex(motif_coord .+ (n_size ÷ 2, t_size ÷ 2))] = 1
+    end
+    return raster
+end
+
+if !@isdefined(detect_an_across_static_rand_trials) || force_redef
+@memoize function detect_an_across_rand_static_trials(motif_class, n_size, t_size, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+    signal_raster = embedded_static_rand_motif(motif_class, n_size, t_size, n_max_jitter, t_max_jitter)
+    l_an_timeseries, trialavg_raster = detect_an_across_trials(signal_raster, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
     return (l_an_timeseries, signal_raster, trialavg_raster)
 end
 end
@@ -39,17 +48,15 @@ else
 end
 mkpath(plotsdir(subdir))
 
-for motif_class_num = 1:14
+for motif_class_num = 2:5
 motif_class = roman_encode(motif_class_num)
-an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_class,boundary)] = let n_pad = 10, t_pad = 30, 
-    n_reps = 1, t_reps = 1,
-    n_lag = 6, t_lag = 5,
-    trials=100, t_step=2,
+an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_class,boundary)] = let n_size = 16, t_size = 60,
+    n_max_jitter = 4, t_max_jitter = 2,
+    n_lag = 6, t_lag = 5, t_step=2,
     t_window = 2t_lag + 1,
-    noise_rate = 0.2,
-    n_bootstraps = 10;
+    noise_rate = 0.2;
 
-l_an_timeseries, signal_raster, trialavg_raster = detect_mid_an_across_trials(motif_class, n_pad, t_pad, n_reps, t_reps, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+l_an_timeseries, signal_raster, trialavg_raster = detect_an_across_rand_static_trials(motif_class, n_size, t_size, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
 
 test_sizes = 1:max(trials÷10,1):trials
 peristimulus_results = if haskey(peristimulus_an_results_dict, motif_class)
@@ -58,8 +65,7 @@ else
     l_motif_an_timeseries = [[contribs[motif_class_num] for contribs in timeseries] for timeseries ∈ l_an_timeseries]
     map(test_sizes) do test_size
         l_timeseries_sample = rand(l_motif_an_timeseries, test_size)
-        motif_t_bounds = get_motif_t_bounds(motif_class)
-        peristimulus_start, peristimulus_stop = calculate_peristimulus_window(t_pad, t_window, t_step, motif_t_bounds...)
+        peristimulus_start, peristimulus_stop = calculate_jitter_peristimulus_window(t_max_jitter, t_window, t_step, t_size ÷ 2)
         test_peristimulus_difference(l_timeseries_sample, peristimulus_start, peristimulus_stop)
     end
 end
@@ -72,6 +78,8 @@ f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
 f_raster = heatmap(raster', axis=(xlabel="time", ylabel="neuron"))
 f_trialavg_raster = heatmap(trialavg_raster', axis=(xlabel="time", ylabel="neuron"))
 
+@show length(l_an_timeseries)
+@show size(l_an_timeseries |> first)
 f_motif_course = plot([a[motif_class_num] for a ∈ mean(l_an_timeseries)], axis=(xlabel="time", ylabel="avg motif $(motif_class) contrib"))
 f_motif_control = plot([a[14] for a ∈ mean(l_an_timeseries)], axis=(xlabel="time", ylabel="avg motif XIV contrib"))
 
