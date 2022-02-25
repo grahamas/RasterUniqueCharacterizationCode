@@ -30,10 +30,12 @@ end
 force_redef = false
 
 boundary = Periodic()
+trials=1000
+n_bootstraps=50
 subdir = if boundary isa Periodic
-    "AN_top_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "AN_$(trials)trials_$(n_bootstraps)bs_top_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa ZeroPadded
-    "AN_top_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "AN_$(trials)trials_$(n_bootstraps)bs_top_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 else
     error("Unrecognized boundary condition for TriCorr")
 end
@@ -43,10 +45,9 @@ for motif_class_num = 1:14
 motif_class = roman_encode(motif_class_num)
 an_top_timeseries_dict[motif_class], peristimulus_an_top_results_dict[motif_class] = let n_pad = 10, t_pad = 30, 
     n_reps = 1, t_reps = 1,
-    n_lag = 6, t_lag = 5,
-    trials=1000, t_step=2,
+    n_lag = 6, t_lag = 5, t_step=2,
     t_window = 2t_lag + 1,
-    noise_rate = 0.2, n_bootstraps=50;
+    noise_rate = 0.2;
 
 l_an_timeseries, signal_raster, trialavg_raster = detect_top_an_across_trials(motif_class, n_pad, t_pad, n_reps, t_reps, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
 
