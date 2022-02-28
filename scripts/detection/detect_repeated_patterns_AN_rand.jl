@@ -32,7 +32,7 @@ else
 end
 mkpath(plotsdir(subdir))
 
-for motif_class_num = 1:14
+for motif_class_num = 2:14
 motif_class = roman_encode(motif_class_num)
 an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_class,boundary)] = let n_size = 16, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
