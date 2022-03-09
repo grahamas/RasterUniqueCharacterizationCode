@@ -6,6 +6,7 @@ using ProgressMeter
 using CairoMakie; plot_ext = "png"
 using Dates
 using Pkg
+using Base.Threads
 
 include(srcdir("roman_encode.jl"))
 include(srcdir("peristimulus_testing.jl"))
