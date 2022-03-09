@@ -41,13 +41,25 @@ function make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; t_window=2t_
     end
 end
 
-function detect_an_across_trials(signal_raster::Array, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+function detect_an_across_trials(motif_class_num::Int, signal_raster::Array, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=false)
+    motif_class = roman_encode(motif_class_num)
     trialavg_raster = zeros(Float64, size(signal_raster)...)
-    l_an_timeseries = @showprogress map(1:trials) do _
+    l_an_timeseries = @showprogress map(1:trials) do trial_num
         noise_raster = rand(size(signal_raster)...) .< noise_rate
         raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
         trialavg_raster += raster
-        make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; n_bootstraps=n_bootstraps)
+        an_timeseries = make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; n_bootstraps=n_bootstraps)
+        if save_dir != false
+            f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
+            f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
+            f_raster = heatmap(raster', axis=(xlabel="time", ylabel="neuron"))
+            f_motif_course = plot([a[motif_class_num] for a ∈ an_timeseries], axis=(xlabel="time", ylabel="avg motif $(motif_class) contrib"))
+            save(joinpath(save_dir ,"signal_motif_$(motif_class)_AN_$(trial_num).$(plot_ext)"), f_signal)
+            save(joinpath(save_dir ,"noise_motif_$(motif_class)_AN_$(trial_num).$(plot_ext)"), f_noise)
+            save(joinpath(save_dir ,"raster_motif_$(motif_class)_AN_$(trial_num).$(plot_ext)"), f_raster)
+            save(joinpath(save_dir ,"motif_$(motif_class)_AN_$(trial_num)_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_course)
+        end
+        an_timeseries
     end
     trialavg_raster ./= trials
     return (l_an_timeseries, trialavg_raster)
@@ -62,14 +74,26 @@ function embedded_rand_motif(motif_class, n_size, t_size, n0_range::AbstractArra
     return raster
 end
 
-@memoize function detect_an_across_jittered_trials(motif_class::String, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+@memoize function detect_an_across_jittered_trials(motif_class_num::Int, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=false)
+    motif_class = roman_encode(motif_class_num)
     trialavg_raster = zeros(Float64, n_size, t_size)
-    l_an_timeseries = @showprogress map(1:trials) do _
+    l_an_timeseries = @showprogress map(1:trials) do trial_num
         signal_raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
         noise_raster = rand(size(signal_raster)...) .< noise_rate
         raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
         trialavg_raster += raster
-        make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; n_bootstraps=n_bootstraps)
+        an_timeseries = make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; n_bootstraps=n_bootstraps)
+        if save_dir != false
+            f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
+            f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
+            f_raster = heatmap(raster', axis=(xlabel="time", ylabel="neuron"))
+            f_motif_course = plot(1:t_step:(size(raster,2)-2t_lag), [a[motif_class_num] for a ∈ an_timeseries], axis=(xlabel="time", ylabel="avg motif $(motif_class) contrib"))
+            save(joinpath(save_dir ,"signal_motif_$(motif_class)_AN_$(trial_num).$(plot_ext)"), f_signal)
+            save(joinpath(save_dir ,"noise_motif_$(motif_class)_AN_$(trial_num).$(plot_ext)"), f_noise)
+            save(joinpath(save_dir ,"raster_motif_$(motif_class)_AN_$(trial_num).$(plot_ext)"), f_raster)
+            save(joinpath(save_dir ,"motif_$(motif_class)_AN_$(trial_num)_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_course)
+        end
+        an_timeseries
     end
     trialavg_raster ./= trials
     return (l_an_timeseries, trialavg_raster)

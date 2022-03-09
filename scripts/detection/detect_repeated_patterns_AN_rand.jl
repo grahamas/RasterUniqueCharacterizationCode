@@ -21,7 +21,7 @@ end
 force_redef = false
 
 boundary = Periodic()
-trials=1000
+trials=100
 n_bootstraps=50
 subdir = if boundary isa Periodic
     "AN_$(trials)trials_$(n_bootstraps)bs_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
@@ -32,7 +32,7 @@ else
 end
 mkpath(plotsdir(subdir))
 
-for motif_class_num = 2:14
+for motif_class_num = [5]
 motif_class = roman_encode(motif_class_num)
 an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_class,boundary)] = let n_size = 16, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
@@ -40,7 +40,9 @@ an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_
     t_window = 2t_lag + 1,
     noise_rate = 0.2;
 
-l_an_timeseries, trialavg_raster = detect_an_across_jittered_trials(motif_class, n_size, t_size, 1:n_size, -t_max_jitter:t_max_jitter, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+save_dir = plotsdir(subdir, "examples")
+mkpath(save_dir)
+l_an_timeseries, trialavg_raster = detect_an_across_jittered_trials(motif_class_num, n_size, t_size, 1:n_size, -t_max_jitter:t_max_jitter, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=false)
 signal_raster = embedded_rand_motif(motif_class, n_size, t_size, -n_max_jitter:n_max_jitter, -t_max_jitter:t_max_jitter, n_max_jitter, t_max_jitter)
 
 test_sizes = 1:max(trials÷10,1):trials
@@ -65,8 +67,8 @@ f_trialavg_raster = heatmap(trialavg_raster', axis=(xlabel="time", ylabel="neuro
 
 @show length(l_an_timeseries)
 @show size(l_an_timeseries |> first)
-f_motif_course = plot([a[motif_class_num] for a ∈ mean(l_an_timeseries)], axis=(xlabel="time", ylabel="avg motif $(motif_class) contrib"))
-f_motif_control = plot([a[14] for a ∈ mean(l_an_timeseries)], axis=(xlabel="time", ylabel="avg motif XIV contrib"))
+f_motif_course = plot(1:t_step:(size(raster,2)-2t_lag), [a[motif_class_num] for a ∈ mean(l_an_timeseries)], axis=(xlabel="time", ylabel="avg motif $(motif_class) contrib"))
+f_motif_control = plot(1:t_step:(size(raster,2)-2t_lag), [a[14] for a ∈ mean(l_an_timeseries)], axis=(xlabel="time", ylabel="avg motif XIV contrib"))
 
 save(plotsdir(subdir,"signal_motif_$(motif_class)_AN.$(plot_ext)"), f_signal)
 save(plotsdir(subdir,"noise_motif_$(motif_class)_AN.$(plot_ext)"), f_noise)
