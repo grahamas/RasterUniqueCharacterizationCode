@@ -10,18 +10,18 @@ using Pkg
 include(srcdir("roman_encode.jl"))
 include(srcdir("peristimulus_testing.jl"))
 
-if !@isdefined(an_timeseries_dict) || force_redef
-    an_timeseries_dict = Dict()
-end
+# if !@isdefined(an_timeseries_dict) || force_redef
+#     an_timeseries_dict = Dict()
+# end
 
-if !@isdefined(peristimulus_an_results_dict) || force_redef
-    peristimulus_an_results_dict = Dict()
-end
+# if !@isdefined(peristimulus_an_results_dict) || force_redef
+#     peristimulus_an_results_dict = Dict()
+# end
 
 force_redef = false
 
 boundary = Periodic()
-trials=100
+trials=1000
 n_bootstraps=50
 subdir = if boundary isa Periodic
     "AN_$(trials)trials_$(n_bootstraps)bs_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
@@ -32,16 +32,17 @@ else
 end
 mkpath(plotsdir(subdir))
 
-for motif_class_num = [5]
+@threads for motif_class_num = 2:14
 motif_class = roman_encode(motif_class_num)
-an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_class,boundary)] = let n_size = 16, t_size = 60,
+#an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_class,boundary)] = 
+let n_size = 16, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
     n_lag = 6, t_lag = 5, t_step=2,
     t_window = 2t_lag + 1,
     noise_rate = 0.2;
 
-save_dir = plotsdir(subdir, "examples")
-mkpath(save_dir)
+# save_dir = plotsdir(subdir, "examples")
+# mkpath(save_dir)
 l_an_timeseries, trialavg_raster = detect_an_across_jittered_trials(motif_class_num, n_size, t_size, 1:n_size, -t_max_jitter:t_max_jitter, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=false)
 signal_raster = embedded_rand_motif(motif_class, n_size, t_size, -n_max_jitter:n_max_jitter, -t_max_jitter:t_max_jitter, n_max_jitter, t_max_jitter)
 
