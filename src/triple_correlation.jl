@@ -1,4 +1,4 @@
-
+# FIXME should encode stepsize
 struct TripleCorrelation{N_dims,T_lag,N_dims2,T_val,ARR<:AbstractArray} <: AbstractArray{T_val,N_dims2}
     arr::ARR
     extent::NTuple{N_dims,T_lag}

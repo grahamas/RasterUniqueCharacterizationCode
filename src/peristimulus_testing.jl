@@ -65,6 +65,11 @@ function detect_an_across_trials(motif_class_num::Int, signal_raster::Array, tri
     return (l_an_timeseries, trialavg_raster)
 end
 
+function detect_feedback_tricorr(tricorr::TripleCorrelation)
+
+end
+
+
 function embedded_rand_motif(motif_class, n_size, t_size, n0_range::AbstractArray, t0_range::AbstractArray, n_max_jitter, t_max_jitter)
     raster = zeros(Bool, n_size, t_size)
     motif_coords = TripleCorrelations.rand_motif(motif_class, n0_range, t0_range, n_max_jitter, t_max_jitter)
