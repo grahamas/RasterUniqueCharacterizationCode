@@ -58,7 +58,7 @@ using LaTeXStrings
 
 function latexify(df::DataFrame)
     """
-Lag Motif & \$n_1\$ & \$n_2\$ & \$t_1\$ & \$t_2\$ & Constraints & Information Flow Pattern & Configuration \\\\
+Lag Motif & \$n_1\$ & \$t_1\$ & \$n_2\$ & \$t_2\$ & Constraints & Information Flow Pattern & Configuration \\\\
     \\hline
     """ *
     join(latexify.(eachrow(df)), "\\\\\n")
@@ -73,7 +73,23 @@ function graphics_scaling_string(n_same_neurons, n_same_times)
 end
 
 function latexify(row::DataFrameRow)
-    row_contents = join(getproperty.(Ref(row), ["spike_motif", "n1", "n2", "t1", "t2", "conditions", "motif_class"]), "&")
+    row_contents = join(getproperty.(Ref(row), ["spike_motif", "n1", "t1", "n2", "t2", "conditions", "motif_class"]), "&")
     row_contents *= "& \\adjustbox{padding=0em 0.5em 0em 0.5em, raise=-0.33\\height}{\\includegraphics{motif_figs/$(row.spike_motif).png}}"
     return row_contents
+end
+
+function remap_old_filenames(srcdir, dstdir)
+    old_classes = generate_all_lag_motif_classes_OLD()
+    new_classes = generate_all_lag_motif_classes()
+    @show new_classes
+    ntnt2name_mapping = Dict(
+        tup[2:end] => tup[1] for tup in new_classes
+    )
+    @show ntnt2name_mapping
+    name2name_mapping = Dict(
+        tup[1] => ntnt2name_mapping[(tup[2],tup[4],tup[3],tup[5])] for tup in old_classes
+    )
+    for (src, dst) in pairs(name2name_mapping)
+        cp(joinpath(srcdir, "$(src).png"), joinpath(dstdir, "$(dst).png"))
+    end
 end
