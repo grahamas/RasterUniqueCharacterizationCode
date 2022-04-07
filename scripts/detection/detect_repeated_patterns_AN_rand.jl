@@ -93,7 +93,7 @@ save(plotsdir(subdir,"trialavg_raster_motif_$(motif_class)_AN.$(plot_ext)"), f_t
 save(plotsdir(subdir,"motif_$(motif_class)_AN_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_course)
 save(plotsdir(subdir,"motif_XIV_given_$(motif_class)_AN_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_control)
 
-save(plotsdir(subdir,"power_vs_sample_size.$(plot_ext)"), f_power)
+save(plotsdir(subdir,"power_vs_sample_size_$(motif_class).$(plot_ext)"), f_power)
 
 (l_an_timeseries, trialavg_raster, peristimulus_results)
 end
