@@ -1,5 +1,5 @@
 function name_info_flow_row(row)
-    (spike_motif=row[1],  n1_num=row[2], t1_num=row[4], n2_num=row[3],  t2_num=row[5], motif_class_num=row[6])
+    (spike_motif=row[1],  n1_num=row[2], t1_num=row[3], n2_num=row[4],  t2_num=row[5], motif_class_num=row[6])
 end
 
 sign_str(x) = if x > 0
