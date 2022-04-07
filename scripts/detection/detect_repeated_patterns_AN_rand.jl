@@ -8,6 +8,7 @@ using Dates
 using Pkg
 using Base.Threads
 using DataFrames, AlgebraOfGraphics
+using JLD2
 
 include(srcdir("roman_encode.jl"))
 include(srcdir("peristimulus_testing.jl"))
@@ -32,8 +33,8 @@ else
 end
 mkpath(plotsdir(subdir))
 
-#@threads for motif_class_num = 2:14
-for motif_class_num = 6:6
+@threads for motif_class_num = 2:14
+#for motif_class_num = 6:6
 motif_class = offset_motif_numeral(motif_class_num)
 prior_results_dict[merge((motif_class=motif_class,), results_key)] = 
 let n_size = 16, t_size = 60,
@@ -98,6 +99,5 @@ save(plotsdir(subdir,"power_vs_sample_size.$(plot_ext)"), f_power)
 end
 end
 
-# let l_an_timeseries=an_timeseries_dict[motif_class];
-# end
+@save plotsdir(subdir, "results.jld2") prior_results_dict
 
