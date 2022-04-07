@@ -1,5 +1,5 @@
 function name_info_flow_row(row)
-    (spike_motif=row[1],  n1_num=row[2], n2_num=row[3], t1_num=row[4], t2_num=row[5], motif_class_num=row[6])
+    (spike_motif=row[1],  n1_num=row[2], t1_num=row[4], n2_num=row[3],  t2_num=row[5], motif_class_num=row[6])
 end
 
 sign_str(x) = if x > 0
@@ -46,8 +46,8 @@ function prettify_row(row)
     (
         spike_motif = row.spike_motif,
         n1 = sign_str(row.n1_num),
-        n2 = sign_str(row.n2_num),
         t1 = sign_str(row.t1_num),
+        n2 = sign_str(row.n2_num),
         t2 = sign_str(row.t2_num),
         motif_class = roman_encode(row.motif_class_num),
         conditions = conditions_from_lag_nums(row.n1_num, row.t1_num, row.n2_num, row.t2_num)
@@ -81,15 +81,17 @@ end
 function remap_old_filenames(srcdir, dstdir)
     old_classes = generate_all_lag_motif_classes_OLD()
     new_classes = generate_all_lag_motif_classes()
+    @show old_classes
     @show new_classes
-    ntnt2name_mapping = Dict(
+    ntnt2newname_mapping = Dict(
         tup[2:end] => tup[1] for tup in new_classes
     )
-    @show ntnt2name_mapping
-    name2name_mapping = Dict(
-        tup[1] => ntnt2name_mapping[(tup[2],tup[4],tup[3],tup[5])] for tup in old_classes
+    @show ntnt2newname_mapping
+    oldname2newname_mapping = Dict(
+        tup[1] => ntnt2newname_mapping[(tup[2],tup[4],tup[3],tup[5])] for tup in old_classes
     )
-    for (src, dst) in pairs(name2name_mapping)
+    @show oldname2newname_mapping
+    for (src, dst) in pairs(oldname2newname_mapping)
         cp(joinpath(srcdir, "$(src).png"), joinpath(dstdir, "$(dst).png"))
     end
 end

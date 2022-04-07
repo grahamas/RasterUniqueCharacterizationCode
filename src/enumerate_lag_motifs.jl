@@ -78,10 +78,10 @@ function generate_classes_iterate_signs(nz_tup)
 end
 
 function generate_all_lag_motif_classes()
-    nonzero_indicators = [(n1, n2, t1, t2) for 
+    nonzero_indicators = [(n1, t1, n2, t2) for 
         t2 ∈ [false, true],
-        t1 ∈ [false, true],
         n2 ∈ [false, true],
+        t1 ∈ [false, true],
         n1 ∈ [false, true]
     ]
     labeled_nonzero_indicators = [(i-1, tup...) for (i,tup) in enumerate(nonzero_indicators)]

@@ -48,12 +48,12 @@ function _2_neuron_motif_classification(n1, n2, t1, t2)
     elseif n_distinct_times == 3
         if (n1 == 0)
             if (0 < t1)
-                return 10
+                return 11
             elseif (t1 < 0)
                 if t2 < 0
-                    return 11
-                elseif t2 > 0
                     return 10
+                elseif t2 > 0
+                    return 11
                 else
                     error("Shouldn't be here")
                 end
@@ -65,7 +65,7 @@ function _2_neuron_motif_classification(n1, n2, t1, t2)
                 return 9
             elseif (t2 > 0)
                 if t1 > 0 # in between
-                    return 11
+                    return 10
                 elseif t1 < 0
                     return 9
                 else
@@ -78,9 +78,9 @@ function _2_neuron_motif_classification(n1, n2, t1, t2)
             if (0 < t1)
                 return 9
             elseif (t1 < 0 < t2)
-                return 11
-            elseif (t2 < 0)
                 return 10
+            elseif (t2 < 0)
+                return 11
             else
                 error("Shouldn't be here")
             end
@@ -121,7 +121,7 @@ function _3_neuron_motif_classification(n1, n2, t1, t2)
     end
 end
 
-function info_flow_classify_lag_motif_class(n1, n2, t1, t2)
+function info_flow_classify_lag_motif_class(n1, t1, n2, t2)
     n_distinct_neurons = count_distinct(0, n1, n2)
 
     n1, n2, t1, t2 = if t1 < t2
@@ -131,16 +131,17 @@ function info_flow_classify_lag_motif_class(n1, n2, t1, t2)
     end
     # Assume below that t1 <= t2
 
-    if n_distinct_neurons == 1
+    motif_class = if n_distinct_neurons == 1
         # All neurons are the same
-        return _1_neuron_motif_classification(n1, n2, t1, t2)
+        _1_neuron_motif_classification(n1, n2, t1, t2)
     elseif n_distinct_neurons == 2
-        return _2_neuron_motif_classification(n1, n2, t1, t2)
+        _2_neuron_motif_classification(n1, n2, t1, t2)
     elseif n_distinct_neurons == 3
-        return _3_neuron_motif_classification(n1, n2, t1, t2)
+        _3_neuron_motif_classification(n1, n2, t1, t2)
     else
         error("Invalid number of same neurons: $n_distinct_neurons")
     end
+    return motif_class - 1
 end
 
 function info_flow_classify_lag_motif_classes(motif_classes::Vector{<:Tuple})
