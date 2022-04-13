@@ -82,7 +82,6 @@ save(plotsdir(subdir,"motif_XIV_given_$(motif_class)_AN_timeseries_$(typeof(boun
 
 (l_an_timeseries, peristimulus_results)
 end
-end
 
 # let l_an_timeseries=an_timeseries_dict[motif_class];
 # end
