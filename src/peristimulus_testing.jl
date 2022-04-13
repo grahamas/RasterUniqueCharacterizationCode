@@ -42,7 +42,7 @@ function make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; t_window=2t_
 end
 
 function detect_an_across_trials(motif_class_num::Int, signal_raster::Array, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=false)
-    motif_class = roman_encode_zero(motif_class_num)
+    motif_class = offset_motif_numeral(motif_class_num)
     trialavg_raster = zeros(Float64, size(signal_raster)...)
     l_an_timeseries = @showprogress map(1:trials) do trial_num
         noise_raster = rand(size(signal_raster)...) .< noise_rate
