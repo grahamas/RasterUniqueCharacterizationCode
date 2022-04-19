@@ -19,9 +19,9 @@ end
 force_redef = false
 
 boundary = Periodic()
-trials=300
+trials=100
 n_bootstraps=20
-n_resamples=100
+n_resamples=50
 n_test_points=20
 α = 0.05
 results_key = (; boundary=boundary, trials=trials, n_bootstraps=n_bootstraps, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
@@ -33,27 +33,38 @@ else
     error("Unrecognized boundary condition for TriCorr")
 end
 mkpath(plotsdir(subdir))
+save_all_trials_dir = plotsdir(subdir, "trials")
+if save_all_trials_dir != false
+    mkpath(save_all_trials_dir)
+end
 
-
-let n_size = 16, t_size = 60,
+@warn "n_size set to 32"
+let n_size = 32, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
     n_lag = 6, t_lag = 5, t_step=2,
     t_window = 2t_lag + 1,
     noise_rate = 0.2;
 
-motif_class_range = 1:14
+# # Middle p0
+# n0_range = (n_max_jitter+1):(n_size-n_max_jitter); t0 = -t_max_jitter:t_max_jitter .+ (t_size ÷ 2)
+# Latter half p0
+n0_range = (n_max_jitter+1):(n_size-n_max_jitter)
+t0_range = ((t_size ÷ 2) + t_max_jitter):(t_size - t_max_jitter)
+@show n0_range t0_range
+
+motif_class_range = 1:5
 
 @threads for motif_class_num = motif_class_range
 motif_class = offset_motif_numeral(motif_class_num)
 
 test_sizes = 1:max(trials÷n_test_points,1):trials
 get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
-    l_an_timeseries, trialavg_raster = detect_an_across_jittered_trials(
-        motif_class_num, n_size, t_size, 1:n_size, -t_max_jitter:t_max_jitter, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=false
+    l_an_timeseries, trialavg_raster = an_timeseries_across_jittered_trials(
+        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=save_all_trials_dir
     )    
     l_motif_an_timeseries = [[contribs[motif_class_num] for contribs in timeseries] for timeseries ∈ l_an_timeseries]
     peristimulus_results = map(test_sizes) do test_size
-        peristimulus_start, peristimulus_stop = calculate_jitter_peristimulus_window(t_max_jitter, t_window, t_step, t_size ÷ 2)
+        peristimulus_start, peristimulus_stop = calculate_jitter_peristimulus_window(t0_range, t_max_jitter, t_window, t_step, t_size)
         effs_and_sigs = map(1:n_resamples) do _
             l_timeseries_sample = rand(l_motif_an_timeseries, test_size)
             test_peristimulus_difference(l_timeseries_sample, peristimulus_start, peristimulus_stop)
@@ -73,7 +84,7 @@ for motif_class_num = motif_class_range
     l_an_timeseries, trialavg_raster, peristimulus_results = 
     prior_results_dict[merge((motif_class=motif_class,), results_key)]
 
-    signal_raster = embedded_rand_motif(motif_class, n_size, t_size, -n_max_jitter:n_max_jitter, -t_max_jitter:t_max_jitter, n_max_jitter, t_max_jitter)
+    signal_raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
     noise_raster = rand(size(signal_raster)...) .< noise_rate
     raster = min.(signal_raster .+ noise_raster, 1)
 
@@ -101,6 +112,6 @@ for motif_class_num = motif_class_range
 
 end
 
-@save plotsdir(subdir, "results.jld2") prior_results_dict
+@save plotsdir(subdir, "results.jld2") prior_results_dict n_size t_size n_max_jitter t_max_jitter n_lag t_lag t_step t_window noise_rate
 
 end

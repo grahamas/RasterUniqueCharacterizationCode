@@ -1,11 +1,33 @@
 
 using Memoize
 
-function test_peristimulus_difference(l_timeseries, start, stop)
+function test_peristimulus_difference(l_timeseries::AbstractVector{<:AbstractVector}, start, stop)
     peristimulus = vcat([timeseries[start:stop] for timeseries ∈ l_timeseries]...)
     nonstimulus = vcat([[timeseries[begin:start-1]; timeseries[stop+1:end]] for timeseries ∈ l_timeseries]...)
     effect_size = mean(peristimulus) - mean(nonstimulus)
-    significance = pvalue(MannWhitneyUTest(peristimulus, nonstimulus))
+    significance = pvalue(UnequalVarianceTTest(peristimulus, nonstimulus))
+    return (effect_size=effect_size, significance=significance)
+end
+
+function test_epoch_difference(l_trials::AbstractVector{<:AbstractVector})
+    stimulus = [trial[2] for trial ∈ l_trials]
+    nonstimulus = [trial[1] for trial ∈ l_trials]
+    effect_size = mean(stimulus) - mean(nonstimulus)
+    significance = pvalue(UnequalVarianceTTest(stimulus, nonstimulus))
+    return (effect_size=effect_size, significance=significance)
+end
+
+function test_epoch_difference(l_trials::AbstractVector{<:AbstractMatrix})
+    # matrix of contributions
+    n_motifs = size(first(l_trials),1)
+    @assert n_motifs == N_MOTIFS
+    hypothesis_pairs = map(1:n_motifs) do i_motif
+        stimulus = [trial[i_motif,2] for trial ∈ l_trials]
+        nonstimulus = [trial[i_motif,1] for trial in l_trials]
+        (stimulus, nonstimulus)
+    end
+    effect_size = hypothesis_pairs .|> (x) -> mean(x[1]) - mean(x[2])
+    significance = [pvalue(UnequalVarianceTTest(pair...)) for pair in hypothesis_pairs]
     return (effect_size=effect_size, significance=significance)
 end
 
@@ -24,13 +46,23 @@ function calculate_peristimulus_window(t_pad, t_window, t_step, motif_t_start, m
     return (first_touch+1, last_touch-1)
 end
 
-function calculate_jitter_peristimulus_window(t_jitter, t_window, t_step, motif_t_target)
-    window_start_dxs = 1:t_step:motif_t_target
-    window_stop_dxs = (1+t_window):t_step:motif_t_target+t_jitter
-    first_touch = findfirst(window_stop_dxs .>= (motif_t_target - t_jitter)) # Must have entire motif
-    last_touch = findlast(window_start_dxs .<= (motif_t_target + t_jitter))
+function calculate_jitter_peristimulus_window(t0_range, t_jitter, t_window, t_step, t_size)
+    motif_start = t0_range[begin]
+    motif_stop = t0_range[end]
+    window_start_dxs = 1:t_step:(t_size-t_window)
+    window_stop_dxs = (1+t_window):t_step:t_size
+    first_touch = findfirst(window_stop_dxs .>= (motif_start - t_jitter)) # Must have entire motif
+    last_touch = findlast(window_start_dxs .<= (motif_stop + t_jitter))
     return (first_touch, last_touch)
 end
+
+# unction calculate_jitter_peristimulus_window(t_jitter, t_window, t_step, motif_t_target)
+#     window_start_dxs = 1:t_step:motif_t_target
+#     window_stop_dxs = (1+t_window):t_step:motif_t_target+t_jitter
+#     first_touch = findfirst(window_stop_dxs .>= (motif_t_target - t_jitter)) # Must have entire motif
+#     last_touch = findlast(window_start_dxs .<= (motif_t_target + t_jitter))
+#     return (first_touch, last_touch)
+# end
 
 function make_an_timeseries(raster, boundary, n_lag, t_lag, t_step; t_window=2t_lag+1, n_bootstraps)
     N,T = size(raster)
@@ -74,12 +106,12 @@ function embedded_rand_motif(motif_class, n_size, t_size, n0_range::AbstractArra
     raster = zeros(Bool, n_size, t_size)
     motif_coords = TripleCorrelations.rand_motif(motif_class, n0_range, t0_range, n_max_jitter, t_max_jitter)
     for motif_coord in motif_coords
-        raster[CartesianIndex((motif_coord .+ (n_size ÷ 2, t_size ÷ 2)) .% (n_size, t_size) .+ (1, 1))] = 1
+        raster[CartesianIndex(motif_coord)] = 1
     end
     return raster
 end
 
-@memoize function detect_an_across_jittered_trials(motif_class_num::Int, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=false)
+function an_timeseries_across_jittered_trials(motif_class_num::Int, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=false)
     motif_class = offset_motif_numeral(motif_class_num)
     trialavg_raster = zeros(Float64, n_size, t_size)
     l_an_timeseries = @showprogress map(1:trials) do trial_num
@@ -102,4 +134,44 @@ end
     end
     trialavg_raster ./= trials
     return (l_an_timeseries, trialavg_raster)
+end
+
+function calculate_trial_epochs(raster, boundary, n_lag, t_lag, epochs; n_bootstraps)
+    mapreduce(hcat, epochs) do epoch
+        bootstrap_normed_sequence_classes(raster[:,epoch], boundary, n_lag, t_lag; n_bootstraps=n_bootstraps)
+    end
+end
+
+function jittered_trials_epochs(motif_class_num::Int, 
+        n_size, t_size, 
+        n0_range, t0_range, 
+        n_max_jitter, t_max_jitter, 
+        trials, noise_rate, boundary, 
+        n_lag, t_lag, n_bootstraps; save_dir=false
+    )
+    motif_class = offset_motif_numeral(motif_class_num)
+    trialavg_raster = zeros(Float64, n_size, t_size)
+    trials_epoch_tricorrs = @showprogress map(1:trials) do trial_num
+        signal_raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
+        signal_raster[:, t0_range[end÷2]] .= 0
+        noise_raster = rand(size(signal_raster)...) .< noise_rate
+        raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
+        trialavg_raster += raster
+        @assert t0_range[begin] > 1+t_max_jitter
+        epochs = [1:t0_range[begin],t0_range]
+        epoch_tricorrs = calculate_trial_epochs(raster, boundary, n_lag, t_lag, epochs; n_bootstraps=n_bootstraps)
+        if save_dir != false
+            f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
+            f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
+            f_raster = heatmap(raster', axis=(xlabel="time", ylabel="neuron"))
+            f_motif_course = plot(1:length(epochs), [a[motif_class_num] for a ∈ epoch_tricorrs], axis=(xlabel="time", ylabel="avg motif $(motif_class) contrib"))
+            save(joinpath(save_dir ,"signal_motif_$(motif_class)_AN_$(trial_num).$(plot_ext)"), f_signal)
+            save(joinpath(save_dir ,"noise_motif_$(motif_class)_AN_$(trial_num).$(plot_ext)"), f_noise)
+            save(joinpath(save_dir ,"raster_motif_$(motif_class)_AN_$(trial_num).$(plot_ext)"), f_raster)
+            save(joinpath(save_dir ,"motif_$(motif_class)_AN_$(trial_num)_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_course)
+        end
+        epoch_tricorrs
+    end
+    trialavg_raster ./= trials
+    return (trials_epoch_tricorrs, trialavg_raster)
 end
