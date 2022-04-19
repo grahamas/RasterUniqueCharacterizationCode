@@ -20,16 +20,16 @@ force_redef = false
 
 N_MOTIFS=14
 boundary = Periodic()
-trials=1000
+trials=20
 n_bootstraps=20
 n_resamples=50
-n_test_points=20
+n_test_points=10
 α = 0.05 / 14
 results_key = (; boundary=boundary, trials=trials, n_bootstraps=n_bootstraps, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
 subdir = if boundary isa Periodic
-    "AN_$(trials)trials_$(n_bootstraps)bs_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "AN_$(trials)trials_IND_$(n_bootstraps)bs_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa ZeroPadded
-    "AN_$(trials)trials_$(n_bootstraps)bs_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "AN_$(trials)trials_IND_$(n_bootstraps)bs_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 else
     error("Unrecognized boundary condition for TriCorr")
 end
@@ -74,10 +74,11 @@ get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
         motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, n_bootstraps; save_dir=save_all_trials_dir
     )
     peristimulus_results = map(test_sizes) do test_size
-        @assert length(axes(trials_epoch_tricorrs[begin],1)) == 14
         effs_and_sigs = mapreduce(vcat, 1:n_resamples) do _
-            l_epochs_sample = rand(trials_epoch_tricorrs, test_size)
-            test_epoch_difference(l_epochs_sample)
+            these_trials_epoch_tricorrs, _ = jittered_trials_epochs(
+                motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, test_size, noise_rate, boundary, n_lag, t_lag, n_bootstraps; save_dir=save_all_trials_dir
+            )
+            test_epoch_difference(these_trials_epoch_tricorrs)
         end
         mean_effect = mean(p.effect_size for p ∈ effs_and_sigs)
         proportion_rejected = mean(p.significance .< α for p ∈ effs_and_sigs)
