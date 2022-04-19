@@ -420,3 +420,4 @@ $RECYCLE.BIN/
 Manifest.toml
 slurm
 *.png
+*.jld2
