@@ -52,7 +52,7 @@ let n_size = 32, t_size = 60,
 n0_range = (n_max_jitter+1):(n_size-n_max_jitter)
 t0_range = ((t_size ÷ 2) + t_max_jitter):(t_size - t_max_jitter)
 
-motif_class_range = 1:2
+motif_class_range = 1:14
 
 @threads for motif_class_num = motif_class_range
 motif_class = offset_motif_numeral(motif_class_num)
