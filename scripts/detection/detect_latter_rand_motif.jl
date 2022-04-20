@@ -76,7 +76,7 @@ get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
     peristimulus_results = map(test_sizes) do test_size
         @assert length(axes(trials_epoch_tricorrs[begin],1)) == 14
         effs_and_sigs = mapreduce(vcat, 1:n_resamples) do _
-            l_epochs_sample = rand(trials_epoch_tricorrs, test_size)
+            l_epochs_sample = StatsBase.sample(trials_epoch_tricorrs, test_size, replace=false)
             test_epoch_difference(l_epochs_sample)
         end
         mean_effect = mean(p.effect_size for p ∈ effs_and_sigs)

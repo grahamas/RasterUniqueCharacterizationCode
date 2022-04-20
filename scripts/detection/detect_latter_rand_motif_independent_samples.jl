@@ -20,9 +20,9 @@ force_redef = false
 
 N_MOTIFS=14
 boundary = Periodic()
-trials=20
+trials=300
 n_bootstraps=20
-n_resamples=50
+n_resamples=30
 n_test_points=10
 α = 0.05 / 14
 results_key = (; boundary=boundary, trials=trials, n_bootstraps=n_bootstraps, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
@@ -52,23 +52,16 @@ let n_size = 32, t_size = 60,
 n0_range = (n_max_jitter+1):(n_size-n_max_jitter)
 t0_range = ((t_size ÷ 2) + t_max_jitter):(t_size - t_max_jitter)
 
-motif_class_range = 1#:5
+motif_class_range = 1:2
 
-for motif_class_num = motif_class_range
+@threads for motif_class_num = motif_class_range
 motif_class = offset_motif_numeral(motif_class_num)
-
-
-
-
-
-
 
 # trials_epoch_tricorrs:
 # [trial : [epochs : motif x epoch]]]
 
-
-
 test_sizes = max(trials÷n_test_points,15):trials÷n_test_points:trials
+@show merge((motif_class=motif_class,), results_key)
 get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
     trials_epoch_tricorrs, trialavg_raster = jittered_trials_epochs(
         motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, n_bootstraps; save_dir=save_all_trials_dir
@@ -91,19 +84,11 @@ get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
 end))
 end
 
-
-
-
-
-
-
-
-
-
-
+@show "Made prior results..."
 
 for motif_class_num = motif_class_range
     motif_class = offset_motif_numeral(motif_class_num)
+    @show "Plots for Motif Class $motif_class"
 
     l_trials_epochs, trialavg_raster, peristimulus_results = 
     prior_results_dict[merge((motif_class=motif_class,), results_key)]

@@ -60,7 +60,7 @@ peristimulus_results = if haskey(peristimulus_an_results_dict, motif_class)
 else
     l_motif_an_timeseries = [[contribs[motif_class_num] for contribs in timeseries] for timeseries ∈ l_an_timeseries]
     map(test_sizes) do test_size
-        l_timeseries_sample = rand(l_motif_an_timeseries, test_size)
+        l_timeseries_sample = StatsBase.sample(l_motif_an_timeseries, test_size, replace=false)
         motif_t_bounds = get_motif_t_bounds(motif_class)
         peristimulus_start, peristimulus_stop = calculate_peristimulus_window(t_pad, t_window, t_step, motif_t_bounds...)
         test_peristimulus_difference(l_timeseries_sample, peristimulus_start, peristimulus_stop)

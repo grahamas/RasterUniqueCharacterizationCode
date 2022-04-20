@@ -66,7 +66,7 @@ get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
     peristimulus_results = map(test_sizes) do test_size
         peristimulus_start, peristimulus_stop = calculate_jitter_peristimulus_window(t0_range, t_max_jitter, t_window, t_step, t_size)
         effs_and_sigs = map(1:n_resamples) do _
-            l_timeseries_sample = rand(l_motif_an_timeseries, test_size)
+            l_timeseries_sample = StatsBase.sample(l_motif_an_timeseries, test_size, replace=false)
             test_peristimulus_difference(l_timeseries_sample, peristimulus_start, peristimulus_stop)
         end
         mean_effect = mean(p.effect_size for p ∈ effs_and_sigs)

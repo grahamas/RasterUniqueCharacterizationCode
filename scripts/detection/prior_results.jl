@@ -50,7 +50,7 @@ keyed_motif_powers = map(keys(prior_results_dict) |> collect) do key
     (key, mapreduce(vcat, axes(l_trial_timeseries[begin],1)) do target_motif_num
         mapreduce(vcat, test_sizes) do test_size
             effs_and_sigs = map(1:n_resamples) do _
-                sampled_trials = rand(l_trial_timeseries, test_size)
+                sampled_trials = StatsBase.sample(l_trial_timeseries, test_size, replace=false)
                 target_motif_sampled_trials = map(sampled_trials) do trial
                     trial[target_motif_num, :]
                 end
