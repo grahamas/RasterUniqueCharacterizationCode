@@ -42,9 +42,9 @@ end
 @warn "n_size set to 32"
 let n_size = 32, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
-    n_lag = 6, t_lag = 5, t_step=2,
+    max_lags = (6, 5), t_step=2,
     t_window = 2t_lag + 1,
-    noise_rate = 0.2;
+    noise_rate = 0.1;
 
 # # Middle p0
 # n0_range = (n_max_jitter+1):(n_size-n_max_jitter); t0 = -t_max_jitter:t_max_jitter .+ (t_size ÷ 2)
@@ -71,7 +71,7 @@ motif_class = offset_motif_numeral(motif_class_num)
 test_sizes = max(trials÷n_test_points,15):trials÷n_test_points:trials
 get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
     trials_epoch_tricorrs, trialavg_raster = jittered_trials_epochs(
-        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, n_bootstraps; save_dir=save_all_trials_dir
+        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, max_lags, n_bootstraps; save_dir=save_all_trials_dir
     )
     peristimulus_results = map(test_sizes) do test_size
         @assert length(axes(trials_epoch_tricorrs[begin],1)) == 14

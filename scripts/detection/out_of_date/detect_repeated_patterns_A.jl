@@ -22,10 +22,10 @@ end
 force_redef = false
 
 
-function make_a_timeseries(raster, boundary, n_lag, t_lag, t_step; t_window=2t_lag+1)
+function make_a_timeseries(raster, boundary, max_lags, t_step; t_window=2t_lag+1)
     T = size(raster,2)
     map(1:t_step:(T-t_window)) do t_start
-        sequence_class_tricorr(raster[:,t_start:t_start+t_window], boundary, n_lag, t_lag)
+        sequence_class_tricorr(raster[:,t_start:t_start+t_window], boundary, max_lags)
     end
 end
 
@@ -58,7 +58,7 @@ motif_class_num = 3
 motif_class = roman_encode(motif_class_num)
 a_timeseries_dict[motif_class], peristimulus_a_results_dict[motif_class] = let n_pad = 10, t_pad = 30, 
     n_reps = 1, t_reps = 1,
-    n_lag = 6, t_lag = 5,
+    max_lag = (6, 5),
     snippets=500, t_step=2,
     t_window = 2t_lag + 1,
     noise_rate = 0.2, noise_calcs=2;
@@ -77,7 +77,7 @@ else
     @showprogress map(1:snippets) do i_snippet
         noise_raster = rand(size(signal_raster)...) .< noise_rate
         raster = min.(signal_raster .+ noise_raster, 1)
-        make_a_timeseries(raster, boundary, n_lag, t_lag, t_step)
+        make_a_timeseries(raster, boundary, max_lags, t_step)
     end
 end
 test_sizes = 1:max(snippets÷10,1):snippets
