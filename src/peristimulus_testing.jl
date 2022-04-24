@@ -153,8 +153,6 @@ function jittered_trials_epochs(motif_class_num::Int,
     trialavg_raster = zeros(Float64, n_size, t_size)
     trials_epoch_tricorrs = @showprogress map(1:trials) do trial_num
         signal_raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
-        @warn "Zeroing signal" maxlog=1
-        signal_raster[:, t0_range[end÷2]] .= 0
         noise_raster = rand(size(signal_raster)...) .< noise_rate
         raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
         trialavg_raster += raster

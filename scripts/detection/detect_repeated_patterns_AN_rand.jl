@@ -50,7 +50,6 @@ let n_size = 32, t_size = 60,
 # Latter half p0
 n0_range = (n_max_jitter+1):(n_size-n_max_jitter)
 t0_range = ((t_size ÷ 2) + t_max_jitter):(t_size - t_max_jitter)
-@show n0_range t0_range
 
 motif_class_range = 1:5
 
