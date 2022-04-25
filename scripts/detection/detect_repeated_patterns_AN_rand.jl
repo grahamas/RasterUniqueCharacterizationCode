@@ -59,7 +59,7 @@ motif_class = offset_motif_numeral(motif_class_num)
 test_sizes = 1:max(trials÷n_test_points,1):trials
 get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
     l_an_timeseries, trialavg_raster = an_timeseries_across_jittered_trials(
-        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=save_all_trials_dir
+        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, (n_lag, t_lag), t_step, n_bootstraps; save_dir=save_all_trials_dir
     )    
     l_motif_an_timeseries = [[contribs[motif_class_num] for contribs in timeseries] for timeseries ∈ l_an_timeseries]
     peristimulus_results = map(test_sizes) do test_size

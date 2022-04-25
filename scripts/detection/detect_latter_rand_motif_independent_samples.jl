@@ -66,12 +66,12 @@ test_sizes = max(trials÷n_test_points,15):trials÷n_test_points:trials
 @show merge((motif_class=motif_class,), results_key)
 get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
     trials_epoch_tricorrs, trialavg_raster = jittered_trials_epochs(
-        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, n_bootstraps; save_dir=save_all_trials_dir
+        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, (n_lag, t_lag), n_bootstraps; save_dir=save_all_trials_dir
     )
     peristimulus_results = map(test_sizes) do test_size
         effs_and_sigs = mapreduce(vcat, 1:n_resamples) do _
             these_trials_epoch_tricorrs, _ = jittered_trials_epochs(
-                motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, test_size, noise_rate, boundary, n_lag, t_lag, n_bootstraps; save_dir=save_all_trials_dir
+                motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, test_size, noise_rate, boundary, (n_lag, t_lag), n_bootstraps; save_dir=save_all_trials_dir
             )
             test_epoch_difference(these_trials_epoch_tricorrs)
         end

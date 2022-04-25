@@ -28,9 +28,9 @@ function embedded_static_rand_motif(motif_class, n_size, t_size, n_max_jitter, t
 end
 
 if !@isdefined(detect_an_across_static_rand_trials) || force_redef
-@memoize function detect_an_across_rand_static_trials(motif_class, n_size, t_size, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+@memoize function detect_an_across_rand_static_trials(motif_class, n_size, t_size, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, (n_lag, t_lag), t_step, n_bootstraps)
     signal_raster = embedded_static_rand_motif(motif_class, n_size, t_size, n_max_jitter, t_max_jitter)
-    l_an_timeseries, trialavg_raster = detect_an_across_trials(signal_raster, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+    l_an_timeseries, trialavg_raster = detect_an_across_trials(signal_raster, trials, noise_rate, boundary, (n_lag, t_lag), t_step, n_bootstraps)
     return (l_an_timeseries, signal_raster, trialavg_raster)
 end
 end
@@ -56,7 +56,7 @@ an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_
     t_window = 2t_lag + 1,
     noise_rate = 0.2;
 
-l_an_timeseries, signal_raster, trialavg_raster = detect_an_across_rand_static_trials(motif_class, n_size, t_size, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps)
+l_an_timeseries, signal_raster, trialavg_raster = detect_an_across_rand_static_trials(motif_class, n_size, t_size, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, (n_lag, t_lag), t_step, n_bootstraps)
 
 test_sizes = 1:max(trials÷10,1):trials
 peristimulus_results = if haskey(peristimulus_an_results_dict, motif_class)

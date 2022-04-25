@@ -44,7 +44,7 @@ let n_size = 16, t_size = 60,
 
 # save_dir = plotsdir(subdir, "examples")
 # mkpath(save_dir)
-l_an_timeseries, trialavg_raster = an_timeseries_across_jittered_trials(motif_class_num, n_size, t_size, 1:n_size, -t_max_jitter:t_max_jitter, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=false)
+l_an_timeseries, trialavg_raster = an_timeseries_across_jittered_trials(motif_class_num, n_size, t_size, 1:n_size, -t_max_jitter:t_max_jitter, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, (n_lag, t_lag), t_step, n_bootstraps; save_dir=false)
 signal_raster = embedded_rand_motif(motif_class, n_size, t_size, -n_max_jitter:n_max_jitter, -t_max_jitter:t_max_jitter, n_max_jitter, t_max_jitter)
 
 test_sizes = 1:max(trials÷10,1):trials

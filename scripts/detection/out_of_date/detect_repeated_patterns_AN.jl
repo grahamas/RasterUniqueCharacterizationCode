@@ -19,10 +19,10 @@ if !@isdefined(peristimulus_an_results_dict) || force_redef
 end
 
 if !@isdefined(detect_mid_an_across_trials) || force_redef
-@memoize function detect_mid_an_across_trials(motif_class_num, n_pad, t_pad, n_reps, t_reps, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=false)
+@memoize function detect_mid_an_across_trials(motif_class_num, n_pad, t_pad, n_reps, t_reps, trials, noise_rate, boundary, (n_lag, t_lag), t_step, n_bootstraps; save_dir=false)
     motif_class = roman_encode(motif_class_num)
     signal_raster = TripleCorrelations.repeat_padded_motif(motif_class, n_pad, t_pad, n_reps, t_reps)
-    l_an_timeseries, trialavg_raster = detect_an_across_trials(motif_class_num, signal_raster, trials,noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=save_dir)
+    l_an_timeseries, trialavg_raster = detect_an_across_trials(motif_class_num, signal_raster, trials,noise_rate, boundary, (n_lag, t_lag), t_step, n_bootstraps; save_dir=save_dir)
     return (l_an_timeseries, signal_raster, trialavg_raster)
 end
 end
@@ -52,7 +52,7 @@ an_timeseries_dict[(motif_class,boundary)], peristimulus_an_results_dict[(motif_
 
 save_dir = plotsdir(subdir, "examples")
 mkpath(save_dir)
-l_an_timeseries, signal_raster, trialavg_raster = detect_mid_an_across_trials(motif_class_num, n_pad, t_pad, n_reps, t_reps, trials, noise_rate, boundary, n_lag, t_lag, t_step, n_bootstraps; save_dir=save_dir)
+l_an_timeseries, signal_raster, trialavg_raster = detect_mid_an_across_trials(motif_class_num, n_pad, t_pad, n_reps, t_reps, trials, noise_rate, boundary, (n_lag, t_lag), t_step, n_bootstraps; save_dir=save_dir)
 
 test_sizes = 1:max(trials÷10,1):trials
 peristimulus_results = if haskey(peristimulus_an_results_dict, motif_class)
