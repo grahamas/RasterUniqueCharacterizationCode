@@ -19,7 +19,7 @@ end
 force_redef = false
 
 N_MOTIFS=14
-boundary = Periodic()
+boundary = PeriodicExtended((6,25))
 trials=300
 n_bootstraps=20
 n_resamples=30
@@ -30,6 +30,8 @@ subdir = if boundary isa Periodic
     "AN_$(trials)trials_IND_$(n_bootstraps)bs_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa ZeroPadded
     "AN_$(trials)trials_IND_$(n_bootstraps)bs_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+elseif boundary isa PeriodicExtended
+    "AN_$(trials)trials_IND_$(n_bootstraps)bs_PeriodicExtended_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 else
     error("Unrecognized boundary condition for TriCorr")
 end
@@ -44,7 +46,7 @@ let n_size = 32, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
     n_lag = 6, t_lag = 5, t_step=2,
     t_window = 2t_lag + 1,
-    noise_rate = 0.2;
+    noise_rate = 0.1;
 
 # # Middle p0
 # n0_range = (n_max_jitter+1):(n_size-n_max_jitter); t0 = -t_max_jitter:t_max_jitter .+ (t_size ÷ 2)
