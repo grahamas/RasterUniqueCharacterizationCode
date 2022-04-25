@@ -142,6 +142,13 @@ function calculate_trial_epochs(raster, boundary, lag_extents, epochs; n_bootstr
     end
 end
 
+function fixed_noise_raster(dims, n_ones)
+    noise_raster = zeros(Bool, dims...)
+    noise_raster[1:n_ones] .= 1
+    shuffle!(noise_raster)
+    return noise_raster
+end
+
 function jittered_trials_epochs(motif_class_num::Int, 
         n_size, t_size, 
         n0_range, t0_range, 
@@ -152,9 +159,10 @@ function jittered_trials_epochs(motif_class_num::Int,
     motif_class = offset_motif_numeral(motif_class_num)
     trialavg_raster = zeros(Float64, n_size, t_size)
     trials_epoch_tricorrs = @showprogress map(1:trials) do trial_num
-        signal_raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
-        noise_raster = rand(size(signal_raster)...) .< noise_rate
-        raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
+        raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
+        noise_ones = floor(Int, noise_rate * length(raster)) - count(raster)
+        noise_raster = fixed_noise_raster(size(raster), noise_ones)
+        raster .&= noise_raster
         trialavg_raster += raster
         @assert t0_range[begin] > 1+t_max_jitter
         epochs = [1:t0_range[begin]-1,t0_range]
