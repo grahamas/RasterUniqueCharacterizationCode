@@ -153,13 +153,11 @@ function jittered_trials_epochs(motif_class_num::Int,
     trialavg_raster = zeros(Float64, n_size, t_size)
     trials_epoch_tricorrs = @showprogress map(1:trials) do trial_num
         signal_raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
-        @warn "Zeroing signal" maxlog=1
-        signal_raster[:, t0_range[end÷2]] .= 0
         noise_raster = rand(size(signal_raster)...) .< noise_rate
         raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
         trialavg_raster += raster
         @assert t0_range[begin] > 1+t_max_jitter
-        epochs = [1:t0_range[begin],t0_range]
+        epochs = [1:t0_range[begin]-1,t0_range]
         epoch_tricorrs = calculate_trial_epochs(raster, boundary, lag_extents, epochs; n_bootstraps=n_bootstraps)
         if save_dir != false
             f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
