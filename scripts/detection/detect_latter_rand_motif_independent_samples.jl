@@ -19,7 +19,7 @@ end
 force_redef = false
 
 N_MOTIFS=14
-boundary = PeriodicExtended((6,25))
+boundary = PeriodicExtended(5)
 trials=300
 n_bootstraps=20
 n_resamples=30
