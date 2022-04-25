@@ -162,7 +162,7 @@ function jittered_trials_epochs(motif_class_num::Int,
         raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
         noise_ones = floor(Int, noise_rate * length(raster)) - count(raster)
         noise_raster = fixed_noise_raster(size(raster), noise_ones)
-        raster .&= noise_raster
+        raster .|= noise_raster
         trialavg_raster += raster
         @assert t0_range[begin] > 1+t_max_jitter
         epochs = [1:t0_range[begin]-1,t0_range]
