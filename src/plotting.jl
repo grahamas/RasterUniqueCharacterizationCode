@@ -38,9 +38,9 @@ bar_theme = Theme(
     )
 )
 
-function plot_network_class_contributions!(ax, raster::BitMatrix, boundary, max_lags; fillto=10^-1)
+function plot_network_class_contributions!(ax, raster::BitMatrix, boundary, lag_extents; fillto=10^-1)
 
-    network_class_contributions = sequence_class_tricorr_unrolled(raster, boundary, max_lags)
+    network_class_contributions = sequence_class_tricorr_unrolled(raster, boundary, lag_extents)
     fillto=if ax.yscale[] == log10
         ax.ytickformat[] = Makie.automatic
         fillto_exp = minimum(floor.(log10.(network_class_contributions)))
@@ -58,9 +58,9 @@ function plot_network_class_contributions!(ax, raster::BitMatrix, boundary, max_
 end
 
 using Makie
-function plot_relative_network_class_contributions!(ax, raster::BitMatrix, boundary, potential_contributions, max_lags)
+function plot_relative_network_class_contributions!(ax, raster::BitMatrix, boundary, potential_contributions, lag_extents)
     ax.ytickformat[] = Makie.automatic
-    network_class_contributions = sequence_class_tricorr_unrolled(raster, boundary, max_lags)
+    network_class_contributions = sequence_class_tricorr_unrolled(raster, boundary, lag_extents)
     relative_contributions = network_class_contributions ./ potential_contributions
     plt = stem!(ax, 1:14 |> collect, (relative_contributions); ytickformat=identity);
     ax.xticks = [1:5:14...]

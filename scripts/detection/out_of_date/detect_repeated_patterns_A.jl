@@ -22,10 +22,10 @@ end
 force_redef = false
 
 
-function make_a_timeseries(raster, boundary, max_lags, t_step; t_window=2t_lag+1)
+function make_a_timeseries(raster, boundary, lag_extents, t_step; t_window=2t_lag+1)
     T = size(raster,2)
     map(1:t_step:(T-t_window)) do t_start
-        sequence_class_tricorr(raster[:,t_start:t_start+t_window], boundary, max_lags)
+        sequence_class_tricorr(raster[:,t_start:t_start+t_window], boundary, lag_extents)
     end
 end
 
@@ -77,7 +77,7 @@ else
     @showprogress map(1:snippets) do i_snippet
         noise_raster = rand(size(signal_raster)...) .< noise_rate
         raster = min.(signal_raster .+ noise_raster, 1)
-        make_a_timeseries(raster, boundary, max_lags, t_step)
+        make_a_timeseries(raster, boundary, lag_extents, t_step)
     end
 end
 test_sizes = 1:max(snippets÷10,1):snippets
