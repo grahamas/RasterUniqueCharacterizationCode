@@ -157,7 +157,7 @@ function jittered_trials_epochs(motif_class_num::Int,
         raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
         trialavg_raster += raster
         @assert t0_range[begin] > 1+t_max_jitter
-        epochs = [1:t0_range[begin],t0_range]
+        epochs = [1:t0_range[begin]-1,t0_range]
         epoch_tricorrs = calculate_trial_epochs(raster, boundary, max_lags, epochs; n_bootstraps=n_bootstraps)
         if save_dir != false
             f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
