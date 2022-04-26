@@ -97,10 +97,6 @@ function detect_an_across_trials(motif_class_num::Int, signal_raster::Array, tri
     return (l_an_timeseries, trialavg_raster)
 end
 
-function detect_feedback_tricorr(tricorr::TripleCorrelation)
-
-end
-
 
 function embedded_rand_motif(motif_class, n_size, t_size, n0_range::AbstractArray, t0_range::AbstractArray, n_max_jitter, t_max_jitter)
     raster = zeros(Bool, n_size, t_size)
@@ -142,7 +138,28 @@ function calculate_trial_epochs(raster, boundary, lag_extents, epochs; n_bootstr
     end
 end
 
-function fixed_noise_raster(dims, n_ones)
+@inline function view_slice_last(arr::AbstractArray{T,N}, dx) where {T,N}
+    view(arr, ntuple(_ -> Colon(), N - 1)..., dx)
+end
+
+function fixed_noise_raster(dims, noise_rate, boundary::PeriodicExtended)
+    n_bdry_ones = round(Int, noise_rate * prod(dims[1:end-1]) * boundary.boundary)
+    n_meat_ones = round(Int, noise_rate * prod(dims[1:end-1]) * (dims[end] - 2(boundary.boundary)))
+    noise_raster = zeros(Bool, dims...)
+    bdry_begin = view_slice_last(noise_raster, 1:boundary.boundary)
+    meat = view_slice_last(noise_raster, boundary.boundary+1:(dims[end]-boundary.boundary))
+    bdry_end = view_slice_last(noise_raster, (dims[end]-boundary.boundary+1):dims[end])
+    bdry_begin[1:n_ones] .= 1
+    meat[1:n_ones] .= 1
+    bdry_end[1:n_ones] .= 1
+    shuffle!(bdry_begin)
+    shuffle!(meat)
+    shuffle!(bdry_end)
+    return noise_raster
+end
+
+function fixed_noise_raster(dims, noise_rate, boundary)
+    n_ones = round(Int, prod(dims) * noise_rate)
     noise_raster = zeros(Bool, dims...)
     noise_raster[1:n_ones] .= 1
     shuffle!(noise_raster)
@@ -161,7 +178,7 @@ function jittered_trials_epochs(motif_class_num::Int,
     trials_epoch_tricorrs = @showprogress map(1:trials) do trial_num
         raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
         noise_ones = floor(Int, noise_rate * length(raster)) - count(raster)
-        noise_raster = fixed_noise_raster(size(raster), noise_ones)
+        noise_raster = fixed_noise_raster(size(raster), noise_ones, boundary)
         raster .|= noise_raster
         trialavg_raster += raster
         @assert t0_range[begin] > 1+t_max_jitter
