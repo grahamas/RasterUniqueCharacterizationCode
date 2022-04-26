@@ -134,6 +134,7 @@ end
 
 function calculate_trial_epochs(raster, boundary, lag_extents, epochs; n_bootstraps)
     mapreduce(hcat, epochs) do epoch
+        @show epoch size(raster[:,epoch]) sum(raster[:,epoch])
         bootstrap_normed_sequence_classes(raster[:,epoch], boundary, (lag_extents); n_bootstraps=n_bootstraps)
     end
 end
@@ -179,9 +180,11 @@ function jittered_trials_epochs(motif_class_num::Int,
         raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
         noise_raster = fixed_noise_raster(size(raster), noise_rate, boundary)
         raster .|= noise_raster
+        @show raster
         trialavg_raster += raster
         @assert t0_range[begin] > 1+t_max_jitter
-        epochs = [1:t0_range[begin]-1,t0_range]
+        epochs = [1:t0_range[begin]-t_max_jitter,(t0_range[begin]-t_max_jitter+1):size(raster)[end]]
+        @show length.(epochs)
         epoch_tricorrs = calculate_trial_epochs(raster, boundary, lag_extents, epochs; n_bootstraps=n_bootstraps)
         if save_dir != false
             f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))

@@ -41,6 +41,8 @@ if save_all_trials_dir != false
     mkpath(save_all_trials_dir)
 end
 
+#n_size = 32; t_size = 60; n_max_jitter = 3; t_max_jitter = 2; n_lag = 12; t_lag = 10; t_step=2; noise_rate = 0.3; motif_class_num = 1; save_all_trials_dir=false
+
 @warn "n_size set to 32"
 let n_size = 32, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
