@@ -149,9 +149,9 @@ function fixed_noise_raster(dims, noise_rate, boundary::PeriodicExtended)
     bdry_begin = view_slice_last(noise_raster, 1:boundary.boundary)
     meat = view_slice_last(noise_raster, boundary.boundary+1:(dims[end]-boundary.boundary))
     bdry_end = view_slice_last(noise_raster, (dims[end]-boundary.boundary+1):dims[end])
-    bdry_begin[1:n_ones] .= 1
-    meat[1:n_ones] .= 1
-    bdry_end[1:n_ones] .= 1
+    bdry_begin[1:n_bdry_ones] .= 1
+    meat[1:n_meat_ones] .= 1
+    bdry_end[1:n_bdry_ones] .= 1
     shuffle!(bdry_begin)
     shuffle!(meat)
     shuffle!(bdry_end)
@@ -175,10 +175,9 @@ function jittered_trials_epochs(motif_class_num::Int,
     )
     motif_class = offset_motif_numeral(motif_class_num)
     trialavg_raster = zeros(Float64, n_size, t_size)
-    trials_epoch_tricorrs = @showprogress map(1:trials) do trial_num
+    trials_epoch_tricorrs = map(1:trials) do trial_num
         raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
-        noise_ones = floor(Int, noise_rate * length(raster)) - count(raster)
-        noise_raster = fixed_noise_raster(size(raster), noise_ones, boundary)
+        noise_raster = fixed_noise_raster(size(raster), noise_rate, boundary)
         raster .|= noise_raster
         trialavg_raster += raster
         @assert t0_range[begin] > 1+t_max_jitter
