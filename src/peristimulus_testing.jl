@@ -73,6 +73,14 @@ function make_an_timeseries(raster, boundary, lag_extents, t_step; t_window=2t_l
     end
 end
 
+function make_a_timeseries(raster, boundary, lag_extents, t_step; t_window=2t_lag+1, n_bootstraps)
+    N,T = size(raster)
+    map(1:t_step:(T-t_window)) do t_start
+        sequence_class_tricorr(raster[:,t_start:t_start+t_window], boundary, (lag_extents)
+        )
+    end
+end
+
 function detect_an_across_trials(motif_class_num::Int, signal_raster::Array, trials, noise_rate, boundary, lag_extents, t_step, n_bootstraps; save_dir=false)
     motif_class = offset_motif_numeral(motif_class_num)
     trialavg_raster = zeros(Float64, size(signal_raster)...)
@@ -132,10 +140,15 @@ function an_timeseries_across_jittered_trials(motif_class_num::Int, n_size, t_si
     return (l_an_timeseries, trialavg_raster)
 end
 
-function calculate_trial_epochs(raster, boundary, lag_extents, epochs; n_bootstraps)
+function calculate_trial_epochs_AN(raster, boundary, lag_extents, epochs; n_bootstraps)
     mapreduce(hcat, epochs) do epoch
-        @show epoch size(raster[:,epoch]) sum(raster[:,epoch])
         bootstrap_normed_sequence_classes(raster[:,epoch], boundary, (lag_extents); n_bootstraps=n_bootstraps)
+    end
+end
+
+function calculate_trial_epochs_A(raster, boundary, lag_extents, epochs; n_bootstraps)
+    mapreduce(hcat, epochs) do epoch
+        sequence_class_tricorr(raster[:,epoch], boundary, (lag_extents))
     end
 end
 
@@ -187,7 +200,7 @@ function jittered_trials_epochs(motif_class_num::Int,
             epoch_raster .|= epoch_noise_raster
         end
         trialavg_raster += raster
-        epoch_tricorrs = calculate_trial_epochs(raster, boundary, lag_extents, epochs; n_bootstraps=n_bootstraps)
+        epoch_tricorrs = calculate_trial_epochs_A(raster, boundary, lag_extents, epochs; n_bootstraps=n_bootstraps)
         if save_dir != false
             f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
             f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
