@@ -20,8 +20,8 @@ force_redef = false
 
 N_MOTIFS=14
 boundary = PeriodicExtended(5)
-trials=300
-n_bootstraps=20
+trials=100
+n_bootstraps=100
 n_resamples=30
 n_test_points=10
 α = 0.05 / 14
@@ -41,12 +41,13 @@ if save_all_trials_dir != false
     mkpath(save_all_trials_dir)
 end
 
+#n_size = 32; t_size = 60; n_max_jitter = 3; t_max_jitter = 2; n_lag = 12; t_lag = 10; t_step=2; noise_rate = 0.3; motif_class_num = 1; save_all_trials_dir=false
+
 @warn "n_size set to 32"
 let n_size = 32, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
-    n_lag = 6, t_lag = 5, t_step=2,
-    t_window = 2t_lag + 1,
-    noise_rate = 0.1;
+    n_lag = 12, t_lag = 10, t_step=2,
+    noise_rate = 0.3;
 
 # # Middle p0
 # n0_range = (n_max_jitter+1):(n_size-n_max_jitter); t0 = -t_max_jitter:t_max_jitter .+ (t_size ÷ 2)
@@ -65,10 +66,12 @@ motif_class = offset_motif_numeral(motif_class_num)
 test_sizes = max(trials÷n_test_points,15):trials÷n_test_points:trials
 @show merge((motif_class=motif_class,), results_key)
 get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
-    trials_epoch_tricorrs, trialavg_raster = jittered_trials_epochs(
+    @info "Motif class $(motif_class) signal..."
+    trials_epoch_tricorrs, trialavg_raster = @time jittered_trials_epochs(
         motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, (n_lag, t_lag), n_bootstraps; save_dir=save_all_trials_dir
     )
-    peristimulus_results = map(test_sizes) do test_size
+    @info "done ($motif_class). Statistics..."
+    peristimulus_results = @showprogress map(test_sizes) do test_size
         effs_and_sigs = mapreduce(vcat, 1:n_resamples) do _
             these_trials_epoch_tricorrs, _ = jittered_trials_epochs(
                 motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, test_size, noise_rate, boundary, (n_lag, t_lag), n_bootstraps; save_dir=save_all_trials_dir
@@ -164,6 +167,6 @@ for motif_class_num = motif_class_range
 
 end
 
-@save plotsdir(subdir, "results.jld2") prior_results_dict n_size t_size n_max_jitter t_max_jitter n_lag t_lag t_step t_window noise_rate
+@save plotsdir(subdir, "results.jld2") prior_results_dict n_size t_size n_max_jitter t_max_jitter n_lag t_lag t_step noise_rate
 
 end

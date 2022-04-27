@@ -97,10 +97,6 @@ function detect_an_across_trials(motif_class_num::Int, signal_raster::Array, tri
     return (l_an_timeseries, trialavg_raster)
 end
 
-function detect_feedback_tricorr(tricorr::TripleCorrelation)
-
-end
-
 
 function embedded_rand_motif(motif_class, n_size, t_size, n0_range::AbstractArray, t0_range::AbstractArray, n_max_jitter, t_max_jitter)
     raster = zeros(Bool, n_size, t_size)
@@ -138,11 +134,33 @@ end
 
 function calculate_trial_epochs(raster, boundary, lag_extents, epochs; n_bootstraps)
     mapreduce(hcat, epochs) do epoch
+        @show epoch size(raster[:,epoch]) sum(raster[:,epoch])
         bootstrap_normed_sequence_classes(raster[:,epoch], boundary, (lag_extents); n_bootstraps=n_bootstraps)
     end
 end
 
-function fixed_noise_raster(dims, n_ones)
+@inline function view_slice_last(arr::AbstractArray{T,N}, dx) where {T,N}
+    view(arr, ntuple(_ -> Colon(), N - 1)..., dx)
+end
+
+function fixed_noise_raster(dims, noise_rate, boundary::PeriodicExtended)
+    n_bdry_ones = round(Int, noise_rate * prod(dims[1:end-1]) * boundary.boundary)
+    n_meat_ones = round(Int, noise_rate * prod(dims[1:end-1]) * (dims[end] - 2(boundary.boundary)))
+    noise_raster = zeros(Bool, dims...)
+    bdry_begin = view_slice_last(noise_raster, 1:boundary.boundary)
+    meat = view_slice_last(noise_raster, boundary.boundary+1:(dims[end]-boundary.boundary))
+    bdry_end = view_slice_last(noise_raster, (dims[end]-boundary.boundary+1):dims[end])
+    bdry_begin[1:n_bdry_ones] .= 1
+    meat[1:n_meat_ones] .= 1
+    bdry_end[1:n_bdry_ones] .= 1
+    shuffle!(bdry_begin)
+    shuffle!(meat)
+    shuffle!(bdry_end)
+    return noise_raster
+end
+
+function fixed_noise_raster(dims, noise_rate, boundary)
+    n_ones = round(Int, prod(dims) * noise_rate)
     noise_raster = zeros(Bool, dims...)
     noise_raster[1:n_ones] .= 1
     shuffle!(noise_raster)
@@ -158,14 +176,13 @@ function jittered_trials_epochs(motif_class_num::Int,
     )
     motif_class = offset_motif_numeral(motif_class_num)
     trialavg_raster = zeros(Float64, n_size, t_size)
-    trials_epoch_tricorrs = @showprogress map(1:trials) do trial_num
+    trials_epoch_tricorrs = map(1:trials) do trial_num
         raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
         @assert t0_range[begin] > 1+t_max_jitter
-        epochs = [1:t0_range[begin]-1,t0_range]
-        for epoch in epochs
+        epochs = [1:t0_range[begin]-t_max_jitter,(t0_range[begin]-t_max_jitter+1):size(raster)[end]]        for epoch in epochs
             epoch_raster = view_slice_last(raster, epoch)
-            epoch_ones = ((prod(size(epoch_raster)) * noise_ones) - count(epoch_raster)) / prod(size(epoch_raster))
-            epoch_noise_raster = fixed_noise_raster((size(raster)[1:end-1]..., length(epoch)), epoch_ones)
+            epoch_noise_rate = ((prod(size(epoch_raster)) * noise_ones) - count(epoch_raster)) / prod(size(epoch_raster))
+            epoch_noise_raster = fixed_noise_raster((size(raster)[1:end-1]..., length(epoch)), epoch_noise_rate, boundary)
             epoch_raster .|= epoch_noise_raster
         end
         trialavg_raster += raster
