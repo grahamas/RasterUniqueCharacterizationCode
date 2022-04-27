@@ -160,12 +160,15 @@ function jittered_trials_epochs(motif_class_num::Int,
     trialavg_raster = zeros(Float64, n_size, t_size)
     trials_epoch_tricorrs = @showprogress map(1:trials) do trial_num
         raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
-        noise_ones = floor(Int, noise_rate * length(raster)) - count(raster)
-        noise_raster = fixed_noise_raster(size(raster), noise_ones)
-        raster .|= noise_raster
-        trialavg_raster += raster
         @assert t0_range[begin] > 1+t_max_jitter
         epochs = [1:t0_range[begin]-1,t0_range]
+        for epoch in epochs
+            epoch_raster = view_slice_last(raster, epoch)
+            epoch_ones = ((prod(size(epoch_raster)) * noise_ones) - count(epoch_raster)) / prod(size(epoch_raster))
+            epoch_noise_raster = fixed_noise_raster((size(raster)[1:end-1]..., length(epoch)), epoch_ones)
+            epoch_raster .|= epoch_noise_raster
+        end
+        trialavg_raster += raster
         epoch_tricorrs = calculate_trial_epochs(raster, boundary, lag_extents, epochs; n_bootstraps=n_bootstraps)
         if save_dir != false
             f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
