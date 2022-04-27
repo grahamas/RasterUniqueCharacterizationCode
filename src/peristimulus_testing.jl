@@ -179,7 +179,8 @@ function jittered_trials_epochs(motif_class_num::Int,
     trials_epoch_tricorrs = map(1:trials) do trial_num
         raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
         @assert t0_range[begin] > 1+t_max_jitter
-        epochs = [1:t0_range[begin]-t_max_jitter,(t0_range[begin]-t_max_jitter+1):size(raster)[end]]        for epoch in epochs
+        epochs = [1:t0_range[begin]-t_max_jitter,(t0_range[begin]-t_max_jitter+1):size(raster)[end]]        
+        for epoch in epochs
             epoch_raster = view_slice_last(raster, epoch)
             epoch_noise_rate = ((prod(size(epoch_raster)) * noise_ones) - count(epoch_raster)) / prod(size(epoch_raster))
             epoch_noise_raster = fixed_noise_raster((size(raster)[1:end-1]..., length(epoch)), epoch_noise_rate, boundary)
