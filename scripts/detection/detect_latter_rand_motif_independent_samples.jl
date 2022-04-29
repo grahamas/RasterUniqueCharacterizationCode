@@ -47,7 +47,7 @@ end
 let n_size = 32, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
     n_lag = 12, t_lag = 10, t_step=2,
-    noise_rate = 0.3;
+    noise_rate = 0.1;
 
 # # Middle p0
 # n0_range = (n_max_jitter+1):(n_size-n_max_jitter); t0 = -t_max_jitter:t_max_jitter .+ (t_size ÷ 2)
