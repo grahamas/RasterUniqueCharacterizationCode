@@ -133,7 +133,7 @@ end
 
 function calculate_trial_epochs(raster, boundary, lag_extents, epochs)
     mapreduce(hcat, epochs) do epoch
-        constituent_normed_sequence_classes(raster[:,epoch], boundary, (lag_extents))
+        rate_normed_sequence_classes(raster[:,epoch], boundary, (lag_extents))
     end
 end
 
