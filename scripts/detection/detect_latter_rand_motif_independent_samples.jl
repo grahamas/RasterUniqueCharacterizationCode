@@ -21,17 +21,16 @@ force_redef = false
 N_MOTIFS=14
 boundary = PeriodicExtended(5)
 trials=100
-n_bootstraps=100
 n_resamples=30
 n_test_points=10
 α = 0.05 / 14
-results_key = (; boundary=boundary, trials=trials, n_bootstraps=n_bootstraps, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
+results_key = (; boundary=boundary, trials=trials, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
 subdir = if boundary isa Periodic
-    "AN_$(trials)trials_IND_$(n_bootstraps)bs_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "AN_$(trials)trials_IND_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa ZeroPadded
-    "AN_$(trials)trials_IND_$(n_bootstraps)bs_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "AN_$(trials)trials_IND_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa PeriodicExtended
-    "AN_$(trials)trials_IND_$(n_bootstraps)bs_PeriodicExtended_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "AN_$(trials)trials_IND_PeriodicExtended_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 else
     error("Unrecognized boundary condition for TriCorr")
 end
@@ -68,13 +67,13 @@ test_sizes = max(trials÷n_test_points,15):trials÷n_test_points:trials
 get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
     @info "Motif class $(motif_class) signal..."
     trials_epoch_tricorrs, trialavg_raster = @time jittered_trials_epochs(
-        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, (n_lag, t_lag), n_bootstraps; save_dir=save_all_trials_dir
+        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, (n_lag, t_lag); save_dir=save_all_trials_dir
     )
     @info "done ($motif_class). Statistics..."
     peristimulus_results = @showprogress map(test_sizes) do test_size
         effs_and_sigs = mapreduce(vcat, 1:n_resamples) do _
             these_trials_epoch_tricorrs, _ = jittered_trials_epochs(
-                motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, test_size, noise_rate, boundary, (n_lag, t_lag), n_bootstraps; save_dir=save_all_trials_dir
+                motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, test_size, noise_rate, boundary, (n_lag, t_lag); save_dir=save_all_trials_dir
             )
             test_epoch_difference(these_trials_epoch_tricorrs)
         end
