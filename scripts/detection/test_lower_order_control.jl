@@ -34,8 +34,8 @@ end
 contributions_I = sequence_class_tricorr(raster_I, Periodic(), lag_extents) .* TripleCorrelations.calculate_scaling_factor(raster_I, Periodic())
 contributions_II = sequence_class_tricorr(raster_II, Periodic(), lag_extents) .* TripleCorrelations.calculate_scaling_factor(raster_II, Periodic())
 
-rate_control_I = expectation_conditioned_on_spike_count(count(raster_I), size(raster_I), lag_extents)
-rate_control_II = expectation_conditioned_on_spike_count(count(raster_II), size(raster_II), lag_extents)
+rate_control_I = expectation_conditioned_on_spike_count(raster_I, Periodic(), lag_extents)
+rate_control_II = expectation_conditioned_on_spike_count(raster_II, Periodic(), lag_extents)
 
 lower_order_control_I = expectation_conditioned_on_lower_orders(contributions_I, count(raster_I), size(raster_I), lag_extents)
 lower_order_control_II = expectation_conditioned_on_lower_orders(contributions_II, count(raster_II), size(raster_II), lag_extents)

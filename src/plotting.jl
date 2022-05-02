@@ -34,23 +34,24 @@ bar_theme = Theme(
         topspinevisible = false,
         xgridcolor = :white,
         ygridcolor = :white,
-        ytickformat = xs -> abbrev_count_label.(xs)
+        #ytickformat = xs -> abbrev_count_label.(xs)
     )
 )
 
 function plot_network_class_contributions!(ax, raster::BitMatrix, boundary, lag_extents; fillto=10^-1)
 
-    network_class_contributions = sequence_class_tricorr_unrolled(raster, boundary, lag_extents)
-    fillto=if ax.yscale[] == log10
-        ax.ytickformat[] = Makie.automatic
-        fillto_exp = minimum(floor.(log10.(network_class_contributions)))
-        10^fillto_exp
-    else
-        0.
-    end
+    network_class_contributions = constituent_normed_sequence_classes(raster, boundary, lag_extents) .- 1
+    @show network_class_contributions
+    # fillto=if ax.yscale[] == log10
+    #     ax.ytickformat[] = Makie.automatic
+    #     fillto_exp = minimum(floor.(log10.(network_class_contributions)))
+    #     10^fillto_exp
+    # else
+    #     0.
+    # end
     plt = barplot!(ax, 1:14 |> collect, network_class_contributions; fillto=fillto);
     ax.xticks = [1:5:14...]
-    ax.xtickformat[] = xs -> (roman_encode ∘ Int).(xs)
+    ax.xtickformat[] = xs -> (offset_motif_numeral ∘ Int).(xs)
     tightlimits!(ax)
     ax.ylabel[] = "number of motifs"
     ax.xlabel[] = "network motif"
@@ -60,11 +61,11 @@ end
 using Makie
 function plot_relative_network_class_contributions!(ax, raster::BitMatrix, boundary, potential_contributions, lag_extents)
     ax.ytickformat[] = Makie.automatic
-    network_class_contributions = sequence_class_tricorr_unrolled(raster, boundary, lag_extents)
+    network_class_contributions = sequence_class_tricorr(raster, boundary, lag_extents)
     relative_contributions = network_class_contributions ./ potential_contributions
     plt = stem!(ax, 1:14 |> collect, (relative_contributions); ytickformat=identity);
     ax.xticks = [1:5:14...]
-    ax.xtickformat[] = xs -> (roman_encode ∘ Int).(xs)
+    ax.xtickformat[] = xs -> (offset_motif_numeral ∘ Int).(xs)
     tightlimits!(ax)
     ax.ylabel[] = "proportion of potential motifs"
     ax.xlabel[] = "network motif"
