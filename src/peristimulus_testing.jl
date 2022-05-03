@@ -19,7 +19,7 @@ end
 
 function safe_pvalue(a, b)
     if a == b
-        return 0.
+        return 1.
     else
         return pvalue(UnequalVarianceTTest(a, b))
     end
