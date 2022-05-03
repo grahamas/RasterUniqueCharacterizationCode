@@ -156,9 +156,11 @@ end
     view(arr, ntuple(_ -> Colon(), N - 1)..., dx)
 end
 
-function fixed_noise_raster(dims, noise_rate, boundary::PeriodicExtended)
+function fixed_noise_raster(raster, noise_rate, boundary::PeriodicExtended)
+    dims = size(raster)
     n_bdry_ones = round(Int, noise_rate * prod(dims[1:end-1]) * boundary.boundary)
     n_meat_ones = round(Int, noise_rate * prod(dims[1:end-1]) * (dims[end] - 2(boundary.boundary)))
+    n_meat_ones -= count(raster)
     noise_raster = zeros(Bool, dims...)
     bdry_begin = view_slice_last(noise_raster, 1:boundary.boundary)
     meat = view_slice_last(noise_raster, boundary.boundary+1:(dims[end]-boundary.boundary))
@@ -172,8 +174,9 @@ function fixed_noise_raster(dims, noise_rate, boundary::PeriodicExtended)
     return noise_raster
 end
 
-function fixed_noise_raster(dims, noise_rate, boundary)
-    n_ones = round(Int, prod(dims) * noise_rate)
+function fixed_noise_raster(raster, noise_rate, boundary)
+    dims = size(raster)
+    n_ones = round(Int, prod(dims) * noise_rate) - count(raster)
     noise_raster = zeros(Bool, dims...)
     noise_raster[1:n_ones] .= 1
     shuffle!(noise_raster)
@@ -195,8 +198,7 @@ function jittered_trials_epochs(motif_class_num::Int,
         epochs = [1:t0_range[begin]-t_max_jitter,(t0_range[begin]-t_max_jitter+1):size(raster)[end]]        
         for epoch in epochs
             epoch_raster = view_slice_last(raster, epoch)
-            epoch_noise_rate = ((prod(size(epoch_raster)) * noise_rate) - count(epoch_raster)) / prod(size(epoch_raster))
-            epoch_noise_raster = fixed_noise_raster((size(raster)[1:end-1]..., length(epoch)), epoch_noise_rate, boundary)
+            epoch_noise_raster = fixed_noise_raster(epoch_raster, noise_rate, boundary)
             epoch_raster .|= epoch_noise_raster
         end
         trialavg_raster += raster
