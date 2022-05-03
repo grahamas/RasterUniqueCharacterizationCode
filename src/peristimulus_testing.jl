@@ -17,6 +17,15 @@ function test_epoch_difference(l_trials::AbstractVector{<:AbstractVector})
     return (effect_size=effect_size, significance=significance)
 end
 
+function safe_pvalue(a, b)
+    if a == b
+        return 0.
+    else
+        return pvalue(UnequalVarianceTTest(a, b))
+    end
+end
+
+
 function test_epoch_difference(l_trials::AbstractVector{<:AbstractMatrix})
     # matrix of contributions
     n_motifs = size(first(l_trials),1)
@@ -27,7 +36,7 @@ function test_epoch_difference(l_trials::AbstractVector{<:AbstractMatrix})
         (stimulus, nonstimulus)
     end
     effect_size = hypothesis_pairs .|> (x) -> mean(x[1]) - mean(x[2])
-    significance = [pvalue(UnequalVarianceTTest(pair...)) for pair in hypothesis_pairs]
+    significance = [safe_pvalue(pair...) for pair in hypothesis_pairs]
     return (effect_size=effect_size, significance=significance)
 end
 
