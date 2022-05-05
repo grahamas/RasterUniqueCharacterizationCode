@@ -142,13 +142,15 @@ end
 
 function calculate_trial_epochs(raster, boundary, lag_extents, epochs)
     mapreduce(hcat, epochs) do epoch
-        rate_normed_sequence_classes(raster[:,epoch], boundary, (lag_extents))
+        contribs = rate_normed_sequence_classes(raster[:,epoch], boundary, lag_extents)
+        @show contribs[1]
+        contribs
     end
 end
 
 function calculate_trial_epochs_A(raster, boundary, lag_extents, epochs; n_bootstraps)
     mapreduce(hcat, epochs) do epoch
-        sequence_class_tricorr(raster[:,epoch], boundary, (lag_extents))
+        sequence_class_tricorr(raster[:,epoch], boundary, lag_extents)
     end
 end
 

@@ -20,9 +20,9 @@ force_redef = false
 
 N_MOTIFS=14
 boundary = PeriodicExtended(5)
-trials=100
+trials=50
 n_resamples=30
-n_test_points=10
+n_test_points=2
 α = 0.05 / 14
 results_key = (; boundary=boundary, trials=trials, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
 subdir = if boundary isa Periodic
