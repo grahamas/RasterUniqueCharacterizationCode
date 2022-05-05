@@ -76,7 +76,7 @@ end
 function make_an_timeseries(raster, boundary, lag_extents, t_step; t_window=2t_lag+1)
     N,T = size(raster)
     map(1:t_step:(T-t_window)) do t_start
-        rate_normed_sequence_classes(raster[:,t_start:t_start+t_window], boundary, (lag_extents)
+        constituent_normed_sequence_classes(raster[:,t_start:t_start+t_window], boundary, (lag_extents)
         )
     end
 end
@@ -142,9 +142,7 @@ end
 
 function calculate_trial_epochs(raster, boundary, lag_extents, epochs)
     mapreduce(hcat, epochs) do epoch
-        contribs = rate_normed_sequence_classes(raster[:,epoch], boundary, lag_extents)
-        @show contribs[1]
-        contribs
+        constituent_normed_sequence_classes(raster[:,epoch], boundary, lag_extents)
     end
 end
 

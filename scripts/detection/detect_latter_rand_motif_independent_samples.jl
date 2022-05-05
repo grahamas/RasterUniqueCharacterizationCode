@@ -20,17 +20,17 @@ force_redef = false
 
 N_MOTIFS=14
 boundary = PeriodicExtended(5)
-trials=50
-n_resamples=30
-n_test_points=2
+trials=400
+n_resamples=50
+n_test_points=7
 α = 0.05 / 14
 results_key = (; boundary=boundary, trials=trials, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
 subdir = if boundary isa Periodic
-    "AN_$(trials)trials_IND_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "Constituent_$(trials)trials_IND_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa ZeroPadded
-    "AN_$(trials)trials_IND_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "Constituent_$(trials)trials_IND_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa PeriodicExtended
-    "AN_$(trials)trials_IND_PeriodicExtended_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "Constituent_$(trials)trials_IND_PeriodicExtended_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 else
     error("Unrecognized boundary condition for TriCorr")
 end
@@ -45,7 +45,7 @@ end
 @warn "n_size set to 32"
 let n_size = 32, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
-    n_lag = 12, t_lag = 10, t_step=2,
+    n_lag = 10, t_lag = 8, t_step=2,
     noise_rate = 0.1;
 
 # # Middle p0
