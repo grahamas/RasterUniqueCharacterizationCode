@@ -37,9 +37,9 @@ contributions_II = sequence_class_tricorr(raster_II, Periodic(), lag_extents) .*
 rate_control_I = expectation_conditioned_on_spike_count(raster_I, Periodic(), lag_extents)
 rate_control_II = expectation_conditioned_on_spike_count(raster_II, Periodic(), lag_extents)
 
-lower_order_control_I = expectation_conditioned_on_lower_orders(contributions_I, count(raster_I), size(raster_I), lag_extents)
-lower_order_control_II = expectation_conditioned_on_lower_orders(contributions_II, count(raster_II), size(raster_II), lag_extents)
+constituent_part_control_I = expectation_conditioned_on_constituent_parts(contributions_I, count(raster_I), size(raster_I), lag_extents)
+constituent_part_control_II = expectation_conditioned_on_constituent_parts(contributions_II, count(raster_II), size(raster_II), lag_extents)
 
-((raster_I, contributions_I, contributions_I ./ rate_control_I, contributions_I ./ lower_order_control_I), (raster_II, contributions_II, contributions_II ./ rate_control_II, contributions_II ./ lower_order_control_II))
+((raster_I, contributions_I, contributions_I ./ rate_control_I, contributions_I ./ constituent_part_control_I), (raster_II, contributions_II, contributions_II ./ rate_control_II, contributions_II ./ constituent_part_control_II))
 
 end
