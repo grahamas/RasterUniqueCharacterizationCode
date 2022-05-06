@@ -20,8 +20,8 @@ force_redef = false
 
 N_MOTIFS=14
 boundary = PeriodicExtended(5)
-trials=400
-n_resamples=50
+trials=100
+n_resamples=15
 n_test_points=7
 α = 0.05 / 14
 results_key = (; boundary=boundary, trials=trials, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
