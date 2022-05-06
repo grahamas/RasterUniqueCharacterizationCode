@@ -38,9 +38,9 @@ bar_theme = Theme(
     )
 )
 
-function plot_network_class_contributions!(ax, raster::BitMatrix, boundary, lag_extents; fillto=10^-1)
+function plot_network_class_contributions!(ax, raster::BitMatrix, boundary, lag_extents; fillto=10^-1, contributions_fn=constituent_normed_sequence_classes)
 
-    network_class_contributions = constituent_normed_sequence_classes(raster, boundary, lag_extents) .- 1
+    network_class_contributions = contributions_fn(raster, boundary, lag_extents) .- 1
     @show network_class_contributions
     # fillto=if ax.yscale[] == log10
     #     ax.ytickformat[] = Makie.automatic

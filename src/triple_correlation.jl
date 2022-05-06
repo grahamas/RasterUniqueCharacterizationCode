@@ -61,11 +61,6 @@ function _calculate_scaled_triple_correlation(raster::BitMatrix, λ_max::Tuple)
 end
 _calculate_scaled_triple_correlation(raster::OffsetArray, args...) = _calculate_scaled_triple_correlation(parent(raster), args...)
 
-function calculate_scaling_factor(raster, λ_max)
-    N, T = size(raster)
-    (T - λ_max[1] + 1) * (N - λ_max[2] + 1)
-end
-
 _hi_bound(l1, l2, M) = M - max(0, l1, l2)
 _lo_bound(l1, l2) = 1 + min(0, l1, l2)
 
