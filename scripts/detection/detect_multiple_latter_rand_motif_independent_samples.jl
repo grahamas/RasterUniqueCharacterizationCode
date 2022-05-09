@@ -27,9 +27,9 @@ n_signals = 3
 norming="rate"
 N_MOTIFS=14
 boundary = Periodic()#Extended(5)
-trials=100
-n_resamples=50
-n_test_points=10
+trials=50
+n_resamples=5
+n_test_points=1
 α = 0.05 / 14
 results_key = (; boundary=boundary, trials=trials, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
 subdir = if boundary isa Periodic
@@ -108,8 +108,15 @@ for motif_class_num = motif_class_range
 
     # Example rasters (signal, noise, combined, trial average)
     signal_raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
+	for _ in 1:(n_signals-1)
+		signal_raster .|= embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
+	end
     noise_raster = rand(size(signal_raster)...) .< noise_rate
     raster = min.(signal_raster .+ noise_raster, 1)
+
+    f_target = Figure()
+    ax = Axis(f_target[1,1], xlabel="epoch", ylabel="A/E Motif $(motif_class)")
+    lines!.(Ref(ax), Ref([1, 2]), [l_trials_epochs[i][motif_class_num,:] for i in 1:size(l_trials_epochs,1)])
 
     f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
     f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
@@ -162,6 +169,8 @@ for motif_class_num = motif_class_range
 
     # save(plotsdir(subdir,"motif_$(motif_class)_AN_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_course)
     # save(plotsdir(subdir,"motif_XIV_given_$(motif_class)_AN_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_control)
+
+    save(plotsdir(subdir,"target_$(motif_class)_epoch_AE.$(plot_ext)"), f_target)
 
     save(plotsdir(subdir,"signal_motif_$(motif_class)_AN.$(plot_ext)"), f_signal)
     save(plotsdir(subdir,"noise_motif_$(motif_class)_AN.$(plot_ext)"), f_noise)

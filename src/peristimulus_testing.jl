@@ -182,7 +182,7 @@ function jittered_trials_epochs(motif_class_num::Int,
         n0_range, t0_range, 
         n_max_jitter, t_max_jitter, 
         trials, noise_rate, n_signals,
-	boundary, 
+    boundary, 
         lag_extents, contribution_fn
 ; save_dir=false
     )
@@ -190,9 +190,9 @@ function jittered_trials_epochs(motif_class_num::Int,
     trialavg_raster = zeros(Float64, n_size, t_size)
     trials_epoch_tricorrs = map(1:trials) do trial_num
         raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
-	for _ in 1:(n_signals-1)
-		raster .|= embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
-	end
+        for _ in 1:(n_signals-1)
+            raster .|= embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
+        end
         @assert t0_range[begin] > 1+t_max_jitter
         epochs = [1:t0_range[begin]-t_max_jitter,(t0_range[begin]-t_max_jitter+1):size(raster)[end]]        
         for epoch in epochs
