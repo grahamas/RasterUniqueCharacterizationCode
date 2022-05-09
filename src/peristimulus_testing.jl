@@ -73,22 +73,22 @@ end
 #     return (first_touch, last_touch)
 # end
 
-function make_an_timeseries(raster, boundary, lag_extents, t_step; t_window=2t_lag+1)
+function make_an_timeseries(raster, boundary, lag_extents, t_step, contribution_fn; t_window=2t_lag+1)
     N,T = size(raster)
     map(1:t_step:(T-t_window)) do t_start
-        constituent_normed_sequence_classes(raster[:,t_start:t_start+t_window], boundary, (lag_extents)
+        contribution_fn(raster[:,t_start:t_start+t_window], boundary, (lag_extents)
         )
     end
 end
 
-function detect_an_across_trials(motif_class_num::Int, signal_raster::Array, trials, noise_rate, boundary, lag_extents, t_step; save_dir=false)
+function detect_an_across_trials(motif_class_num::Int, signal_raster::Array, trials, noise_rate, boundary, lag_extents, t_step, contribution_fn; save_dir=false)
     motif_class = offset_motif_numeral(motif_class_num)
     trialavg_raster = zeros(Float64, size(signal_raster)...)
     l_an_timeseries = @showprogress map(1:trials) do trial_num
         noise_raster = rand(size(signal_raster)...) .< noise_rate
         raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
         trialavg_raster += raster
-        an_timeseries = make_an_timeseries(raster, boundary, lag_extents, t_step)
+        an_timeseries = make_an_timeseries(raster, boundary, lag_extents, t_step, contribution_fn)
         if save_dir != false
             f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
             f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
@@ -115,7 +115,7 @@ function embedded_rand_motif(motif_class, n_size, t_size, n0_range::AbstractArra
     return raster
 end
 
-function an_timeseries_across_jittered_trials(motif_class_num::Int, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, lag_extents, t_step; save_dir=false)
+function an_timeseries_across_jittered_trials(motif_class_num::Int, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, lag_extents, t_step, contribution_fn; save_dir=false)
     motif_class = offset_motif_numeral(motif_class_num)
     trialavg_raster = zeros(Float64, n_size, t_size)
     l_an_timeseries = @showprogress map(1:trials) do trial_num
@@ -123,7 +123,7 @@ function an_timeseries_across_jittered_trials(motif_class_num::Int, n_size, t_si
         noise_raster = rand(size(signal_raster)...) .< noise_rate
         raster = Array{Bool}((signal_raster .+ noise_raster) .> 0)
         trialavg_raster += raster
-        an_timeseries = make_an_timeseries(raster, boundary, lag_extents, t_step)
+        an_timeseries = make_an_timeseries(raster, boundary, lag_extents, t_step, contribution_fn)
         if save_dir != false
             f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
             f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
@@ -140,15 +140,9 @@ function an_timeseries_across_jittered_trials(motif_class_num::Int, n_size, t_si
     return (l_an_timeseries, trialavg_raster)
 end
 
-function calculate_trial_epochs(raster, boundary, lag_extents, epochs)
+function calculate_trial_epochs(raster, boundary, lag_extents, epochs, contribution_fn)
     mapreduce(hcat, epochs) do epoch
-        constituent_normed_sequence_classes(raster[:,epoch], boundary, lag_extents)
-    end
-end
-
-function calculate_trial_epochs_A(raster, boundary, lag_extents, epochs; n_bootstraps)
-    mapreduce(hcat, epochs) do epoch
-        sequence_class_tricorr(raster[:,epoch], boundary, lag_extents)
+        contribution_fn(raster[:,epoch], boundary, lag_extents)
     end
 end
 
@@ -187,13 +181,18 @@ function jittered_trials_epochs(motif_class_num::Int,
         n_size, t_size, 
         n0_range, t0_range, 
         n_max_jitter, t_max_jitter, 
-        trials, noise_rate, boundary, 
-        lag_extents; save_dir=false
+        trials, noise_rate, n_signals,
+	boundary, 
+        lag_extents, contribution_fn
+; save_dir=false
     )
     motif_class = offset_motif_numeral(motif_class_num)
     trialavg_raster = zeros(Float64, n_size, t_size)
     trials_epoch_tricorrs = map(1:trials) do trial_num
         raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
+	for _ in 1:(n_signals-1)
+		raster .|= embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
+	end
         @assert t0_range[begin] > 1+t_max_jitter
         epochs = [1:t0_range[begin]-t_max_jitter,(t0_range[begin]-t_max_jitter+1):size(raster)[end]]        
         for epoch in epochs
@@ -202,7 +201,7 @@ function jittered_trials_epochs(motif_class_num::Int,
             epoch_raster .|= epoch_noise_raster
         end
         trialavg_raster += raster
-        epoch_tricorrs = calculate_trial_epochs(raster, boundary, lag_extents, epochs)
+        epoch_tricorrs = calculate_trial_epochs(raster, boundary, lag_extents, epochs, contribution_fn)
         if save_dir != false
             f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
             f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))

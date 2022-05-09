@@ -18,19 +18,26 @@ if !@isdefined(prior_results_dict) || force_redef
 end
 force_redef = false
 
+contribution_fn_dict = Dict(
+	"constituent" => constituent_normed_sequence_classes,
+	"rate" => rate_normed_sequence_classes
+)
+
+n_signals = 3
+norming="rate"
 N_MOTIFS=14
-boundary = PeriodicExtended(5)
+boundary = Periodic()#Extended(5)
 trials=100
-n_resamples=15
-n_test_points=7
+n_resamples=50
+n_test_points=10
 α = 0.05 / 14
 results_key = (; boundary=boundary, trials=trials, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
 subdir = if boundary isa Periodic
-    "Constituent_$(trials)trials_IND_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "$(norming)_$(trials)trials_$(n_signals)sigs_IND_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa ZeroPadded
-    "Constituent_$(trials)trials_IND_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "$(norming)_$(trials)trials_$(n_signals)sigs_IND_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa PeriodicExtended
-    "Constituent_$(trials)trials_IND_PeriodicExtended_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "$(norming)_$(trials)trials_$(n_signals)sigs_IND_PeriodicExtended_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 else
     error("Unrecognized boundary condition for TriCorr")
 end
@@ -47,6 +54,8 @@ let n_size = 32, t_size = 60,
     n_max_jitter = 3, t_max_jitter = 2,
     n_lag = 10, t_lag = 8, t_step=2,
     noise_rate = 0.1;
+
+contribution_fn = contribution_fn_dict[norming]
 
 # # Middle p0
 # n0_range = (n_max_jitter+1):(n_size-n_max_jitter); t0 = -t_max_jitter:t_max_jitter .+ (t_size ÷ 2)
@@ -67,13 +76,13 @@ test_sizes = max(trials÷n_test_points,15):trials÷n_test_points:trials
 get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
     @info "Motif class $(motif_class) signal..."
     trials_epoch_tricorrs, trialavg_raster = @time jittered_trials_epochs(
-        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, (n_lag, t_lag); save_dir=save_all_trials_dir
+        motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, n_signals, boundary, (n_lag, t_lag), contribution_fn; save_dir=save_all_trials_dir
     )
     @info "done ($motif_class). Statistics..."
     peristimulus_results = @showprogress map(test_sizes) do test_size
         effs_and_sigs = mapreduce(vcat, 1:n_resamples) do _
             these_trials_epoch_tricorrs, _ = jittered_trials_epochs(
-                motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, test_size, noise_rate, boundary, (n_lag, t_lag); save_dir=save_all_trials_dir
+                motif_class_num, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, test_size, noise_rate, n_signals, boundary, (n_lag, t_lag), contribution_fn; save_dir=save_all_trials_dir
             )
             test_epoch_difference(these_trials_epoch_tricorrs)
         end
