@@ -117,6 +117,10 @@ for motif_class_num = motif_class_range
     f_target = Figure()
     ax = Axis(f_target[1,1], xlabel="epoch", ylabel="A/E Motif $(motif_class)")
     lines!.(Ref(ax), Ref([1, 2]), [l_trials_epochs[i][motif_class_num,:] for i in 1:size(l_trials_epochs,1)])
+    epoch1 = [l_trials_epochs[i][motif_class_num,1] for i ∈ 1:size(l_trials_epochs,1)]
+    epoch2 = [l_trials_epochs[i][motif_class_num,2] for i ∈ 1:size(l_trials_epochs,1)]
+    boxplot!([[1 for _ ∈ 1:length(epoch1)]..., [2 for _ ∈ 1:length(epoch2)]...], [epoch1..., epoch2...])
+    ax.xticks = ([1,2], ["noise","signal"])
 
     f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
     f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
