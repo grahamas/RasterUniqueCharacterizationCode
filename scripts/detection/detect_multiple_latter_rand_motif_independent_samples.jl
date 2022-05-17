@@ -19,12 +19,13 @@ end
 force_redef = false
 
 contribution_fn_dict = Dict(
-	"constituent" => constituent_normed_sequence_classes,
-	"rate" => rate_normed_sequence_classes
+	"constituent_divide" => sequence_classes_divide_E_given_constituents,
+	"rate_divide" => sequence_classes_divide_E_given_rate,
+    "actual" => sequence_class_tricorr
 )
 
 n_signals = 3
-norming="rate"
+norming="rate_divide"
 N_MOTIFS=14
 boundary = Periodic()#Extended(5)
 trials=50

@@ -6,8 +6,11 @@ using UnicodePlots
 raster_size = (1500, 2000)
 lag_extents = (5,7)
 
-expectations = map(100:100:500000) do n_spikes
-    expectation_conditioned_on_spike_count(n_spikes, raster_size, lag_extents)
+raster = zeros(Bool, raster_size...)
+
+expectations = map(100:100:5000000) do n_spikes
+    raster[1:n_spikes] .= 1
+    expectation_conditioned_on_spike_count(raster, Periodic(), lag_extents)
 end
 
-lineplot((getindex.(expectations, 4) .* getindex.(expectations, 1)), getindex.(expectations, 5))
+lineplot((getindex.(expectations, 2) .* getindex.(expectations, 1)), getindex.(expectations, 3))
