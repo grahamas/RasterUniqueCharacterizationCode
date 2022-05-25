@@ -29,8 +29,8 @@ norming="rate_divide"
 N_MOTIFS=14
 boundary = PeriodicExtended(50)
 boundary_width = boundary isa PeriodicExtended ? boundary.boundary : 0
-trials=50
-n_resamples=5
+trials=15
+n_resamples=2
 n_test_points=1
 α = 0.05 / 14
 
@@ -78,6 +78,7 @@ motif_class = offset_motif_numeral(motif_class_num)
 # [trial : [epochs : motif x epoch]]]
 
 test_sizes = max(trials÷n_test_points,15):trials÷n_test_points:trials
+@assert length(test_sizes) > 0
 @show merge((motif_class=motif_class,), results_key)
 get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
     @info "Motif class $(motif_class) signal..."
