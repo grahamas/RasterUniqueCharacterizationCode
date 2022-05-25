@@ -67,7 +67,7 @@ contribution_fn = contribution_fn_dict[norming]
 # n0_range = (n_max_jitter+1):(n_size-n_max_jitter); t0 = -t_max_jitter:t_max_jitter .+ (t_size ÷ 2)
 # Latter half p0
 n0_range = (n_max_jitter+1):(n_size-n_max_jitter)
-t0_range = ((t_size ÷ 2) + t_max_jitter+bdry):(t_size - t_max_jitter-bdry)
+t0_range = ((t_size ÷ 2) + t_max_jitter+boundary_width):(t_size - t_max_jitter-boundary_width)
 
 motif_class_range = 1:14
 
