@@ -161,11 +161,11 @@ for motif_class_num = motif_class_range
             )
         end
     end)
-    plt_power = data(peristimulus_results_by_motif) * mapping(:sample_size, :proportion_rejected, color=:detect_motif) * visual(Scatter)
+    plt_power = data(peristimulus_results_by_motif) * mapping(:sample_size, :proportion_rejected, color=:detect_motif) * (visual(Scatter, markersize=0.1, strokewidth=0) + smooth(span=0.9, degree=2))
     color_list = distinguishable_colors(N_MOTIFS, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
     f_power = draw(plt_power, palettes=(color=color_list,))#, axis=(; title="Signal motif-class $(motif_class)"))
 
-    plt_effect = data(peristimulus_results_by_motif) * mapping(:sample_size, :mean_effect, color=:detect_motif) * visual(Scatter)
+    plt_effect = data(peristimulus_results_by_motif) * mapping(:sample_size, :mean_effect, color=:detect_motif) * (visual(Scatter, markersize=0.1, strokewidth=0) + smooth(span=0.9, degree=2))
     color_list = distinguishable_colors(N_MOTIFS, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
     f_effect = draw(plt_effect, palettes=(color=color_list,))#, axis=(; title="Signal motif-class $(motif_class)"))
 
