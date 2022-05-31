@@ -102,99 +102,99 @@ get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
     # peristimulus results are each motif contrib vectors
     (trials_epoch_tricorrs, trialavg_raster, peristimulus_results)
 end))
+end # throads for
+
+@show "Made prior results..."
+
+for motif_class_num = motif_class_range
+    motif_class = offset_motif_numeral(motif_class_num)
+    @show "Plots for Motif Class $motif_class"
+
+    l_trials_epochs, trialavg_raster, peristimulus_results = 
+    prior_results_dict[merge((motif_class=motif_class,), results_key)]
+
+    # Example rasters (signal, noise, combined, trial average)
+    signal_raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
+	for _ in 1:(n_signals-1)
+		signal_raster .|= embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
+	end
+    noise_raster = rand(size(signal_raster)...) .< noise_rate
+    raster = min.(signal_raster .+ noise_raster, 1)
+
+    f_target = Figure()
+    ax = Axis(f_target[1,1], xlabel="epoch", ylabel="A/E Motif $(motif_class)")
+    lines!.(Ref(ax), Ref([1, 2]), [l_trials_epochs[i][motif_class_num,:] for i in 1:size(l_trials_epochs,1)])
+    epoch1 = [l_trials_epochs[i][motif_class_num,1] for i ∈ 1:size(l_trials_epochs,1)]
+    epoch2 = [l_trials_epochs[i][motif_class_num,2] for i ∈ 1:size(l_trials_epochs,1)]
+    boxplot!([[1 for _ ∈ 1:length(epoch1)]..., [2 for _ ∈ 1:length(epoch2)]...], [epoch1..., epoch2...])
+    ax.xticks = ([1,2], ["noise","signal"])
+
+    f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
+    f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
+    f_raster = heatmap(raster', axis=(xlabel="time", ylabel="neuron"))
+    f_trialavg_raster = heatmap(trialavg_raster', axis=(xlabel="time", ylabel="neuron"))
+
+    epochs_df = DataFrame(mapreduce(vcat, l_trials_epochs) do trial
+        @assert size(trial) == (14,2)
+        mapreduce(vcat, axes(trial, 1)) do i
+            [(
+                signal_motif=motif_class, 
+                detect_motif=offset_motif_numeral(i),
+                condition=:nonstim,
+                contrib=trial[i,1]
+            ), 
+            (
+                signal_motif=motif_class, 
+                detect_motif=offset_motif_numeral(i),
+                condition=:stim,
+                contrib=trial[i,2]
+            )]
+        end
+    end)
+    plt_epochs = data(epochs_df) * mapping(:contrib, color=:condition, layout=:detect_motif) * histogram(; bins=15)
+    f_epochs = draw(plt_epochs)#, axis=(; title=("Motif-class $(motif_class) signal")))
+
+    # Power timeseries
+    peristimulus_results_by_motif = DataFrame(mapreduce(vcat, peristimulus_results) do result
+        map(axes(result.mean_effect,1)) do i_motif
+            (
+                signal_motif=motif_class,
+                detect_motif=TripleCorrelations.offset_motif_numeral(i_motif),
+                mean_effect=result.mean_effect[i_motif], 
+                #std_effect=result.std_effect[i_motif],
+                proportion_rejected=result.proportion_rejected[i_motif],
+                sample_size=result.sample_size
+            )
+        end
+    end)
+    plt_power = data(peristimulus_results_by_motif) * mapping(:sample_size, :proportion_rejected, color=:detect_motif) * (visual(Scatter, markersize=0.1, strokewidth=0) + smooth(span=0.9, degree=2))
+    color_list = distinguishable_colors(N_MOTIFS, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
+    f_power = draw(plt_power, palettes=(color=color_list,))#, axis=(; title="Signal motif-class $(motif_class)"))
+
+    plt_effect = data(peristimulus_results_by_motif) * mapping(:sample_size, :mean_effect, color=:detect_motif) * (visual(Scatter, markersize=0.1, strokewidth=0) + smooth(span=0.9, degree=2))
+    color_list = distinguishable_colors(N_MOTIFS, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
+    f_effect = draw(plt_effect, palettes=(color=color_list,))#, axis=(; title="Signal motif-class $(motif_class)"))
+
+    # f_motif_course = plot(1:2, [a[motif_class_num] for a ∈ mean(l_trials_epochs)], axis=(xlabel="time", ylabel="avg motif $(motif_class) contrib"))
+    # f_motif_control = plot(1:2, [a[14] for a ∈ mean(l_trials_epochs)], axis=(xlabel="time", ylabel="avg motif XIV contrib"))
+
+    # save(plotsdir(subdir,"motif_$(motif_class)_AN_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_course)
+    # save(plotsdir(subdir,"motif_XIV_given_$(motif_class)_AN_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_control)
+
+    save(plotsdir(subdir,"target_$(motif_class)_epoch_AE.$(plot_ext)"), f_target)
+
+    save(plotsdir(subdir,"signal_motif_$(motif_class)_AN.$(plot_ext)"), f_signal)
+    save(plotsdir(subdir,"noise_motif_$(motif_class)_AN.$(plot_ext)"), f_noise)
+    save(plotsdir(subdir,"raster_motif_$(motif_class)_AN.$(plot_ext)"), f_raster)
+    save(plotsdir(subdir,"trialavg_raster_motif_$(motif_class)_AN.$(plot_ext)"), f_trialavg_raster)
+
+    save(plotsdir(subdir,"power_vs_sample_size_$(motif_class).$(plot_ext)"), f_power)
+    save(plotsdir(subdir,"effect_vs_sample_size_$(motif_class).$(plot_ext)"), f_effect)
+
+    save(plotsdir(subdir, "motif_contrib_distributions_$(motif_class).$(plot_ext)"), f_epochs)
+
 end
+
+@save plotsdir(subdir, "results.jld2") prior_results_dict n_size t_size n_max_jitter t_max_jitter n_lag t_lag t_step noise_rate
+
 end
-# @show "Made prior results..."
-
-# for motif_class_num = motif_class_range
-#     motif_class = offset_motif_numeral(motif_class_num)
-#     @show "Plots for Motif Class $motif_class"
-
-#     l_trials_epochs, trialavg_raster, peristimulus_results = 
-#     prior_results_dict[merge((motif_class=motif_class,), results_key)]
-
-#     # Example rasters (signal, noise, combined, trial average)
-#     signal_raster = embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
-# 	for _ in 1:(n_signals-1)
-# 		signal_raster .|= embedded_rand_motif(motif_class, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter)
-# 	end
-#     noise_raster = rand(size(signal_raster)...) .< noise_rate
-#     raster = min.(signal_raster .+ noise_raster, 1)
-
-#     f_target = Figure()
-#     ax = Axis(f_target[1,1], xlabel="epoch", ylabel="A/E Motif $(motif_class)")
-#     lines!.(Ref(ax), Ref([1, 2]), [l_trials_epochs[i][motif_class_num,:] for i in 1:size(l_trials_epochs,1)])
-#     epoch1 = [l_trials_epochs[i][motif_class_num,1] for i ∈ 1:size(l_trials_epochs,1)]
-#     epoch2 = [l_trials_epochs[i][motif_class_num,2] for i ∈ 1:size(l_trials_epochs,1)]
-#     boxplot!([[1 for _ ∈ 1:length(epoch1)]..., [2 for _ ∈ 1:length(epoch2)]...], [epoch1..., epoch2...])
-#     ax.xticks = ([1,2], ["noise","signal"])
-
-#     f_signal = heatmap(signal_raster', axis=(xlabel="time", ylabel="neuron"))
-#     f_noise = heatmap(noise_raster', axis=(xlabel="time", ylabel="neuron"))
-#     f_raster = heatmap(raster', axis=(xlabel="time", ylabel="neuron"))
-#     f_trialavg_raster = heatmap(trialavg_raster', axis=(xlabel="time", ylabel="neuron"))
-
-#     epochs_df = DataFrame(mapreduce(vcat, l_trials_epochs) do trial
-#         @assert size(trial) == (14,2)
-#         mapreduce(vcat, axes(trial, 1)) do i
-#             [(
-#                 signal_motif=motif_class, 
-#                 detect_motif=offset_motif_numeral(i),
-#                 condition=:nonstim,
-#                 contrib=trial[i,1]
-#             ), 
-#             (
-#                 signal_motif=motif_class, 
-#                 detect_motif=offset_motif_numeral(i),
-#                 condition=:stim,
-#                 contrib=trial[i,2]
-#             )]
-#         end
-#     end)
-#     plt_epochs = data(epochs_df) * mapping(:contrib, color=:condition, layout=:detect_motif) * histogram(; bins=15)
-#     f_epochs = draw(plt_epochs)#, axis=(; title=("Motif-class $(motif_class) signal")))
-
-#     # Power timeseries
-#     peristimulus_results_by_motif = DataFrame(mapreduce(vcat, peristimulus_results) do result
-#         map(axes(result.mean_effect,1)) do i_motif
-#             (
-#                 signal_motif=motif_class,
-#                 detect_motif=TripleCorrelations.offset_motif_numeral(i_motif),
-#                 mean_effect=result.mean_effect[i_motif], 
-#                 #std_effect=result.std_effect[i_motif],
-#                 proportion_rejected=result.proportion_rejected[i_motif],
-#                 sample_size=result.sample_size
-#             )
-#         end
-#     end)
-#     plt_power = data(peristimulus_results_by_motif) * mapping(:sample_size, :proportion_rejected, color=:detect_motif) * (visual(Scatter, markersize=0.1, strokewidth=0) + smooth(span=0.9, degree=2))
-#     color_list = distinguishable_colors(N_MOTIFS, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
-#     f_power = draw(plt_power, palettes=(color=color_list,))#, axis=(; title="Signal motif-class $(motif_class)"))
-
-#     plt_effect = data(peristimulus_results_by_motif) * mapping(:sample_size, :mean_effect, color=:detect_motif) * (visual(Scatter, markersize=0.1, strokewidth=0) + smooth(span=0.9, degree=2))
-#     color_list = distinguishable_colors(N_MOTIFS, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
-#     f_effect = draw(plt_effect, palettes=(color=color_list,))#, axis=(; title="Signal motif-class $(motif_class)"))
-
-#     # f_motif_course = plot(1:2, [a[motif_class_num] for a ∈ mean(l_trials_epochs)], axis=(xlabel="time", ylabel="avg motif $(motif_class) contrib"))
-#     # f_motif_control = plot(1:2, [a[14] for a ∈ mean(l_trials_epochs)], axis=(xlabel="time", ylabel="avg motif XIV contrib"))
-
-#     # save(plotsdir(subdir,"motif_$(motif_class)_AN_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_course)
-#     # save(plotsdir(subdir,"motif_XIV_given_$(motif_class)_AN_timeseries_$(typeof(boundary)).$(plot_ext)"), f_motif_control)
-
-#     save(plotsdir(subdir,"target_$(motif_class)_epoch_AE.$(plot_ext)"), f_target)
-
-#     save(plotsdir(subdir,"signal_motif_$(motif_class)_AN.$(plot_ext)"), f_signal)
-#     save(plotsdir(subdir,"noise_motif_$(motif_class)_AN.$(plot_ext)"), f_noise)
-#     save(plotsdir(subdir,"raster_motif_$(motif_class)_AN.$(plot_ext)"), f_raster)
-#     save(plotsdir(subdir,"trialavg_raster_motif_$(motif_class)_AN.$(plot_ext)"), f_trialavg_raster)
-
-#     save(plotsdir(subdir,"power_vs_sample_size_$(motif_class).$(plot_ext)"), f_power)
-#     save(plotsdir(subdir,"effect_vs_sample_size_$(motif_class).$(plot_ext)"), f_effect)
-
-#     save(plotsdir(subdir, "motif_contrib_distributions_$(motif_class).$(plot_ext)"), f_epochs)
-
-# end
-
-# @save plotsdir(subdir, "results.jld2") prior_results_dict n_size t_size n_max_jitter t_max_jitter n_lag t_lag t_step noise_rate
-
-# end
