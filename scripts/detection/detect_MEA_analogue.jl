@@ -195,6 +195,6 @@ for motif_class_num = motif_class_range
 
 end
 
-@save plotsdir(subdir, "results.jld2") prior_results_dict n_size t_size n_max_jitter t_max_jitter n_lag t_lag t_step noise_rate
+@save plotsdir(subdir, "results.jld2") prior_results_dict n_size t_size n_max_jitter t_max_jitter n_lag t_lag t_step noise_rate n_signals
 
 end
