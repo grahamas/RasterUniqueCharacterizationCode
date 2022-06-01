@@ -16,5 +16,5 @@ trials = 16
 tests = results[1, :n_hypothesis_tests]
 plt = data(filter(x -> x.n_trials == trials, results)) * mapping(:signal_motif => "signal motif", :detect_motif => "detected motif", color= :proportion_rejected => "prop. positive detections") * visual(markersize=30)
 
-axis = (; title = "$(trials) trials | ")
+axis = (; title = "$(trials) trials | $(n_hypothesis_tests) tests | ")
 fig = draw(plt; axis)
