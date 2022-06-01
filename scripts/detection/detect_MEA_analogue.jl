@@ -168,13 +168,13 @@ for motif_class_num = motif_class_range
             )
         end
     end)
-    plt_power = data(peristimulus_results_by_motif) * mapping(:sample_size, :proportion_rejected, color=:detect_motif) * (visual(Scatter, markersize=5) + smooth(span=0.9, degree=2))
+    plt_power = data(peristimulus_results_by_motif) * mapping(:sample_size => "# trials", :proportion_rejected => "proportion positive tests (of $n_tests)", color=:detect_motif => "motif detected") * (visual(Scatter, markersize=5) + smooth(span=0.9, degree=2))
     color_list = distinguishable_colors(N_MOTIFS, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
-    f_power = draw(plt_power, palettes=(color=color_list,))#, axis=(; title="Signal motif-class $(motif_class)"))
+    f_power = draw(plt_power, palettes=(color=color_list,), axis=(; title="Signal motif-class $(motif_class)"))
 
-    plt_effect = data(peristimulus_results_by_motif) * mapping(:sample_size, :mean_effect, color=:detect_motif) * (visual(Scatter, markersize=5) + smooth(span=0.9, degree=2))
+    plt_effect = data(peristimulus_results_by_motif) * mapping(:sample_size => "# trials", :mean_effect => "mean effect", color=:detect_motif => "motif detected") * (visual(Scatter, markersize=5) + smooth(span=0.9, degree=2))
     color_list = distinguishable_colors(N_MOTIFS, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
-    f_effect = draw(plt_effect, palettes=(color=color_list,))#, axis=(; title="Signal motif-class $(motif_class)"))
+    f_effect = draw(plt_effect, palettes=(color=color_list,), axis=(; title="Signal motif-class $(motif_class)"))
 
     # f_motif_course = plot(1:2, [a[motif_class_num] for a ∈ mean(l_trials_epochs)], axis=(xlabel="time", ylabel="avg motif $(motif_class) contrib"))
     # f_motif_control = plot(1:2, [a[14] for a ∈ mean(l_trials_epochs)], axis=(xlabel="time", ylabel="avg motif XIV contrib"))
