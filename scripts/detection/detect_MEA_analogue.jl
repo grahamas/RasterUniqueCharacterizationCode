@@ -24,19 +24,20 @@ contribution_fn_dict = Dict(
     "actual" => sequence_class_tricorr
 )
 
-n_signals = 10
+n_signals = 7
 norming="rate_divide"
 N_MOTIFS=14
 boundary = Periodic()#Extended(50)
 boundary_width = boundary isa PeriodicExtended ? boundary.boundary : 0
-trials=15
-n_resamples=2
-n_test_points=2
+trials=35
+n_resamples=25
+n_test_points=7
+MIN_TRIALS = 6
 α = 0.05 / 14
 
 MEA_n = 100
 MEA_t = 101
-MEA_spikes = 167
+MEA_spikes = 261
 results_key = (; boundary=boundary, trials=trials, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
 subdir = if boundary isa Periodic
     "$(norming)_$(trials)trials_$(n_signals)sigs_MEA_$(MEA_n)x$(MEA_t)_$(MEA_spikes)spk_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
@@ -77,7 +78,7 @@ motif_class = offset_motif_numeral(motif_class_num)
 # trials_epoch_tricorrs:
 # [trial : [epochs : motif x epoch]]]
 
-test_sizes = max(trials÷n_test_points,15):trials÷n_test_points:trials
+test_sizes = max(trials÷n_test_points,MIN_TRIALS):trials÷n_test_points:trials
 @assert length(test_sizes) > 0
 @show merge((motif_class=motif_class,), results_key)
 get!(prior_results_dict, merge((motif_class=motif_class,), results_key), (begin
@@ -167,11 +168,11 @@ for motif_class_num = motif_class_range
             )
         end
     end)
-    plt_power = data(peristimulus_results_by_motif) * mapping(:sample_size, :proportion_rejected, color=:detect_motif) * (visual(Scatter, markersize=0.1, strokewidth=0) + smooth(span=0.9, degree=2))
+    plt_power = data(peristimulus_results_by_motif) * mapping(:sample_size, :proportion_rejected, color=:detect_motif) * (visual(Scatter, markersize=5) + smooth(span=0.9, degree=2))
     color_list = distinguishable_colors(N_MOTIFS, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
     f_power = draw(plt_power, palettes=(color=color_list,))#, axis=(; title="Signal motif-class $(motif_class)"))
 
-    plt_effect = data(peristimulus_results_by_motif) * mapping(:sample_size, :mean_effect, color=:detect_motif) * (visual(Scatter, markersize=0.1, strokewidth=0) + smooth(span=0.9, degree=2))
+    plt_effect = data(peristimulus_results_by_motif) * mapping(:sample_size, :mean_effect, color=:detect_motif) * (visual(Scatter, markersize=5) + smooth(span=0.9, degree=2))
     color_list = distinguishable_colors(N_MOTIFS, [RGB(1,1,1), RGB(0,0,0)], dropseed=true)
     f_effect = draw(plt_effect, palettes=(color=color_list,))#, axis=(; title="Signal motif-class $(motif_class)"))
 
