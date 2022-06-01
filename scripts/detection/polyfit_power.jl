@@ -10,8 +10,6 @@ using Base.Threads
 using DataFrames, AlgebraOfGraphics, Colors
 using JLD2
 
-using Polynomials
-
 include(srcdir("roman_encode.jl"))
 include(srcdir("peristimulus_testing.jl"))
 
