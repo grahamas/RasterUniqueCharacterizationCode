@@ -59,7 +59,7 @@ end
 @warn "n_size set to 32"
 let n_size = MEA_n, t_size = (MEA_t*2)+(boundary_width*4),
     n_max_jitter = 2, t_max_jitter = 3,
-    n_lag = 10, t_lag = 8, t_step=2,
+    n_lag = 10, t_lag = 10, t_step=2,
     noise_rate = MEA_spikes / (MEA_n * MEA_t);
 
 contribution_fn = contribution_fn_dict[norming]

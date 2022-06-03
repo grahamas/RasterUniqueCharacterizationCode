@@ -1,19 +1,52 @@
 
-using Memoize
+using Memoize, ThreadsX
+
+get_boundary_width(boundary::PeriodicExtended) = boundary.boundary
+get_boundary_width(boundary::Periodic) = 0
+function run_peristimulus_tests(raster_size, 
+        boundary::AbstractBoundaryCondition, 
+        lag_extents, 
+        n_signals, signal_jitters,  noise_rate, 
+        trials, tests, 
+        contribution_fn
+    )
+    n_size, t_size = raster_size
+    n_max_jitter, t_max_jitter = signal_jitters
+    boundary_width = get_boundary_width(boundary)
+
+    n0_range = (n_max_jitter+1):(n_size-n_max_jitter)
+    t0_range = ((t_size ÷ 2) + t_max_jitter+boundary_width):(t_size - t_max_jitter-boundary_width)
+
+    motif_class_range = 1:14
+
+    test_results = DataFrame(mapreduce(vcat, motif_class_range, init=[]) do signal_motif_class_num
+        l_detected_motifs = ThreadsX.map(1:tests) do test
+            trials_epoch_tricorrs = jittered_trials_epochs(raster_size, boundary, lag_extents, signal_motif_class_num, n_signals, (n0_range, t0_range), signal_jitters, noise_rate, n_trials, contribution_fn)
+            motif_significances = test_epoch_difference(trials_epoch_tricorrs).significance
+            motif_significances .< α
+        end
+        proportion_detected_by_motif = mean(l_detected_motifs)
+        ThreadsX.map(1:14) do detected_motif_num
+            proportion_detected = proportion_detected_by_motif[detected_motif_num]
+            (
+                proportion_detected=proportion_detected,
+                detected_motif=detected_motif_num,
+                signal_motif=signal_motif_class_num,
+                n_signals = n_signals,
+                n_tests = tests,
+                n_trials = trials
+            )
+        end
+    end)
+    return test_results
+end
+
 
 function test_peristimulus_difference(l_timeseries::AbstractVector{<:AbstractVector}, start, stop)
     peristimulus = vcat([timeseries[start:stop] for timeseries ∈ l_timeseries]...)
     nonstimulus = vcat([[timeseries[begin:start-1]; timeseries[stop+1:end]] for timeseries ∈ l_timeseries]...)
     effect_size = mean(peristimulus) - mean(nonstimulus)
     significance = pvalue(UnequalVarianceTTest(peristimulus, nonstimulus))
-    return (effect_size=effect_size, significance=significance)
-end
-
-function test_epoch_difference(l_trials::AbstractVector{<:AbstractVector})
-    stimulus = [trial[2] for trial ∈ l_trials]
-    nonstimulus = [trial[1] for trial ∈ l_trials]
-    effect_size = mean(stimulus) - mean(nonstimulus)
-    significance = pvalue(UnequalVarianceTTest(stimulus, nonstimulus))
     return (effect_size=effect_size, significance=significance)
 end
 
@@ -25,11 +58,11 @@ function safe_pvalue(a, b)
     end
 end
 
-
 function test_epoch_difference(l_trials::AbstractVector{<:AbstractMatrix})
     # matrix of contributions
     n_motifs = size(first(l_trials),1)
     @assert n_motifs == N_MOTIFS
+    @assert size(first(l_trials),2) == 2
     hypothesis_pairs = map(1:n_motifs) do i_motif
         stimulus = [trial[i_motif,2] for trial ∈ l_trials]
         nonstimulus = [trial[i_motif,1] for trial in l_trials]
@@ -115,6 +148,15 @@ function embedded_rand_motif(motif_class, n_size, t_size, n0_range::AbstractArra
     return raster
 end
 
+function embedded_rand_motif(motif_class, raster_size, base_node_ranges, signal_jitters)
+    raster = zeros(Bool, raster_size...)
+    motif_coords = TripleCorrelations.rand_motif(motif_class, base_node_ranges, signal_jitters)
+    for motif_coord in motif_coords
+        raster[CartesianIndex(motif_coord)] = 1
+    end
+    return raster
+end
+
 function an_timeseries_across_jittered_trials(motif_class_num::Int, n_size, t_size, n0_range, t0_range, n_max_jitter, t_max_jitter, trials, noise_rate, boundary, lag_extents, t_step, contribution_fn; save_dir=false)
     motif_class = offset_motif_numeral(motif_class_num)
     trialavg_raster = zeros(Float64, n_size, t_size)
@@ -175,6 +217,34 @@ function fixed_noise_raster(raster, noise_rate, boundary)
     noise_raster[1:n_ones] .= 1
     shuffle!(noise_raster)
     return noise_raster
+end
+
+function jittered_trials_epochs(raster_size::Tuple, 
+        boundary::AbstractBoundaryCondition,
+        lag_extents, 
+        motif_class_num::Int, n_signals::Int, base_node_ranges, signal_jitters,
+        noise_rate, n_trials,
+        contribution_fn
+    )
+    n0_range, t0_range = base_node_ranges
+    n_max_jitter, t_max_jitter = signal_jitters
+    @assert t0_range[begin] > 1+t_max_jitter
+    epochs = [1:t0_range[begin]-t_max_jitter,(t0_range[begin]-t_max_jitter+1):raster_size[end]] # HELP: is raster_size right?
+    motif_class = offset_motif_numeral(motif_class_num)
+    trials_epoch_tricorrs = map(1:n_trials) do _
+        raster = embedded_rand_motif(motif_class, raster_size, base_node_ranges, signal_jitters)
+        for _ in 1:(n_signals-1)
+            raster .|= embedded_rand_motif(motif_class, raster_size, base_node_ranges, signal_jitters)
+        end  
+        for epoch in epochs
+            epoch_raster = view_slice_last(raster, epoch)
+            epoch_noise_raster = fixed_noise_raster(epoch_raster, noise_rate, boundary)
+            epoch_raster .|= epoch_noise_raster
+        end
+        epoch_tricorrs = calculate_trial_epochs(raster, boundary, lag_extents, epochs, contribution_fn)
+        epoch_tricorrs
+    end
+    return trials_epoch_tricorrs
 end
 
 function jittered_trials_epochs(motif_class_num::Int, 
