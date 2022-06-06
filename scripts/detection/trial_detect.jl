@@ -16,13 +16,8 @@ include(srcdir("peristimulus_testing.jl"))
 let conditioned_on = Rate(),
     postproc! = zscore!;
 
-<<<<<<< Updated upstream
-n_signals = 1
-=======
 #n_signals = 1
 norming="rate_divide"
->>>>>>> Stashed changes
-N_MOTIFS=14
 boundary = Periodic()#Extended(50)
 boundary_width = get_boundary_width(boundary)
 #n_trials=35
