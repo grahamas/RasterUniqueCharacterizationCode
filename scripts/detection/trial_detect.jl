@@ -57,3 +57,5 @@ fig = draw(plt; axis)
 outputdir = plotsdir("particular_trial_detects")
 mkpath(outputdir)
 save(joinpath(outputdir, "crossmotif_significances_$(fn2str(postproc!))_$(obj2str(conditioned_on))_trials$(n_trials)_tests$(n_tests)_signals$(n_signals)_spikes$(MEA_spikes)_size$(raster_size)_lags$(lag_extents).png"), fig)
+
+end
