@@ -174,10 +174,8 @@ function jittered_trials_epochs(raster_size::Tuple,
         end  
         for epoch in epochs
             epoch_raster = view_slice_last(raster, epoch)
-            while mean(epoch_raster) != noise_rate
-                epoch_noise_raster = fixed_noise_raster(epoch_raster, noise_rate, boundary)
-                epoch_raster .|= epoch_noise_raster
-            end
+            epoch_noise_raster = fixed_noise_raster(epoch_raster, noise_rate, boundary)
+            epoch_raster .|= epoch_noise_raster
         end
         epoch_tricorrs = calculate_trial_epochs(raster, boundary, lag_extents, epochs, postproc!)
         epoch_tricorrs
