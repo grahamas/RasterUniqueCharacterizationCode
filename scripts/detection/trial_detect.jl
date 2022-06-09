@@ -44,7 +44,7 @@ trial_results = @time run_peristimulus_tests(
     raster_size, boundary, lag_extents, 
     n_signals, signal_jitters, noise_rate,
     n_trials, n_tests,
-    precalced_postproc!
+    precalced_postproc!, α
 )
 
 trial_results.signal_motif_numeral = offset_motif_numeral.(trial_results.signal_motif)
