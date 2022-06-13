@@ -28,7 +28,7 @@ MEA_spikes = 267
 
 raster_size = (MEA_n, (MEA_t*2)+(boundary_width*4))
 signal_jitters = (12, 12)
-lag_extents = (25, 25)
+lag_extents = (20, 20)
 noise_rate = MEA_spikes / (MEA_n * MEA_t)
 
 only_rate_raster = zeros(Bool, MEA_n, MEA_t + boundary_width*2)
