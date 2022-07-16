@@ -12,8 +12,9 @@ using JLD2
 
 include(srcdir("roman_encode.jl"))
 include(srcdir("peristimulus_testing.jl"))
+include(srcdir("filename_utils.jl"))
 
-let conditioned_on = Constituents(),
+let conditioned_on = Rate(),
     postproc! = zscore!;
 
 #n_signals = 1
