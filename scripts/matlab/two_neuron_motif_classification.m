@@ -21,12 +21,12 @@ function motif = two_neuron_motif_classification(n1, n2, t1, t2)
     elseif n_distinct_times == 3
         if (n1 == 0)
             if (0 < t1)
-                motif=10;
+                motif=11;
             elseif (t1 < 0)
                 if t2 < 0
-                    motif=11;
-                elseif t2 > 0
                     motif=10;
+                elseif t2 > 0
+                    motif=11;
                 else
                     error("Shouldn't be here")
                 end
@@ -37,8 +37,8 @@ function motif = two_neuron_motif_classification(n1, n2, t1, t2)
             if (t2 < 0)
                 motif=9;
             elseif (t2 > 0)
-                if t1 > 0 % in between
-                    motif=11;
+                if t1 > 0 
+                    motif=10;
                 elseif t1 < 0
                     motif=9;
                 else
@@ -48,10 +48,10 @@ function motif = two_neuron_motif_classification(n1, n2, t1, t2)
         elseif (n1 == n2)
             if (0 < t1)
                 motif= 9;
-            elseif (t1 < 0 || t2 > 0)
-                motif=11;
-            elseif (t2 < 0)
+            elseif (t1 < 0) &&(0 < t2)%(t1 < 0 || t2 > 0)
                 motif=10;
+            elseif (t2 < 0)
+                motif=11;
             else
                 error("Shouldn't be here")
             end
