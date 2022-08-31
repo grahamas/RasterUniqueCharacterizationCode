@@ -2,10 +2,6 @@
 
 All figures and results in Deshpande, Smith, & van Drongelen (2022, submitted) were created using [Matlab (Mathworks)](https://www.mathworks.com/products/matlab.html) R2021b, and can be replicated by running the appropriately named script in the `matlab` directory.
 
-### Prior versions
-
-For the 2021 [preprint](https://www.biorxiv.org/content/10.1101/2021.08.16.456546v1)[^1], see commit tagged `preprint-v2`. 
-
 ### Julia
 
 We also include Julia implementations of the tools we used for our analyses.
@@ -26,4 +22,8 @@ Much of the Matlab code is replicated in Julia, though no Julia code was used to
 This will install all necessary packages for you to be able to run the Julia scripts and
 everything should work out of the box, including correctly finding local paths.
 
-   [^1]: Note that preprint v1 has figures differing from the included code, though displaying the same underlying data.
+### Prior versions
+
+For the 2021 [preprint](https://www.biorxiv.org/content/10.1101/2021.08.16.456546v1)[^1], see the commit tagged [`preprint-v2`](https://github.com/grahamas/RasterUniqueCharacterizationCode/tree/preprint-v2). 
+
+For completeness, we include the tag [`preprint-v1`](https://github.com/grahamas/RasterUniqueCharacterizationCode/tree/preprint-v1), which links to the code used in the first preprint submission (2021 Aug 17).
