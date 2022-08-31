@@ -24,6 +24,6 @@ everything should work out of the box, including correctly finding local paths.
 
 ### Prior versions
 
-For the 2021 [preprint](https://www.biorxiv.org/content/10.1101/2021.08.16.456546v1)[^1], see the commit tagged [`preprint-v2`](https://github.com/grahamas/RasterUniqueCharacterizationCode/tree/preprint-v2). 
+For the 2021 [preprint](https://www.biorxiv.org/content/10.1101/2021.08.16.456546v1), see the commit tagged [`preprint-v2`](https://github.com/grahamas/RasterUniqueCharacterizationCode/tree/preprint-v2). 
 
 For completeness, we include the tag [`preprint-v1`](https://github.com/grahamas/RasterUniqueCharacterizationCode/tree/preprint-v1), which links to the code used in the first preprint submission (2021 Aug 17).
