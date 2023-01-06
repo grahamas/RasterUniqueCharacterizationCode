@@ -74,12 +74,14 @@ function plot_relative_network_class_contributions!(ax, raster::BitMatrix, bound
     plt
 end
 
-function plot_raster!(ax, raster::BitMatrix)
+function plot_raster!(ax, raster)
     plt = heatmap!(ax, raster', colormap=:binary)
-    hidedecorations!(ax)
+    hidedecorations!(ax, label=false)
+    ax.xlabel[] = "time"
+    ax.ylabel[] = "neuron"
     #ax.tellheight = true
-    ax.bottomspinevisible = false
-    ax.leftspinevisible = false
+    # ax.bottomspinevisible = false
+    # ax.leftspinevisible = false
     ax.topspinevisible = false
     ax.rightspinevisible = false
     ax.autolimitaspect = 1.

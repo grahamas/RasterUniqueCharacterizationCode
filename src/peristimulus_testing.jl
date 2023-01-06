@@ -10,6 +10,7 @@ function run_peristimulus_tests(raster_size,
         n_trials, n_tests, 
         postproc!, α
     )
+    @show noise_rate
     n_size, t_size = raster_size
     n_max_jitter, t_max_jitter = signal_jitters
     boundary_width = get_boundary_width(boundary)
@@ -162,10 +163,11 @@ function jittered_trials_epochs(raster_size::Tuple,
         noise_rate, n_trials,
         postproc!
     )
+    bd = get_boundary_width(boundary)
     n0_range, t0_range = base_node_ranges
     n_max_jitter, t_max_jitter = signal_jitters
     @assert t0_range[begin] > 1+t_max_jitter
-    epochs = [1:t0_range[begin]-t_max_jitter,(t0_range[begin]-t_max_jitter+1):raster_size[end]] # HELP: is raster_size right?
+    epochs = [1:t0_range[begin]-t_max_jitter-bd,(t0_range[begin]-bd-t_max_jitter+1):(raster_size[end])] # HELP: is raster_size right?
     motif_class = offset_motif_numeral(motif_class_num)
     trials_epoch_tricorrs = map(1:n_trials) do _
         raster = embedded_rand_motif(motif_class, raster_size, base_node_ranges, signal_jitters)
@@ -174,8 +176,7 @@ function jittered_trials_epochs(raster_size::Tuple,
         end  
         for epoch in epochs
             epoch_raster = view_slice_last(raster, epoch)
-            epoch_noise_raster = fixed_noise_raster(epoch_raster, noise_rate, boundary)
-            epoch_raster .|= epoch_noise_raster
+            set_noise_raster!(epoch_raster, boundary, noise_rate)
         end
         epoch_tricorrs = calculate_trial_epochs(raster, boundary, lag_extents, epochs, postproc!)
         epoch_tricorrs
@@ -183,3 +184,17 @@ function jittered_trials_epochs(raster_size::Tuple,
     return trials_epoch_tricorrs
 end
 
+function set_noise_raster!(raster, boundary::Union{ZeroPadded,Periodic}, noise_rate)
+    noise_spikes = round(Int, prod(size(raster)) * noise_rate)
+    spikes_left = noise_spikes - count(raster) 
+    while spikes_left > 0
+        epoch_noise_raster = fixed_noise_raster(raster, noise_rate, boundary)
+        raster .|= epoch_noise_raster
+        spikes_left = noise_spikes - count(raster)
+    end
+end
+
+function set_noise_raster!(raster, boundary::PeriodicExtended, noise_rate)
+    set_noise_raster!(slice_meat(raster, boundary), Periodic(), noise_rate)
+    set_noise_raster!.(slice_flanks(raster, boundary), Ref(Periodic()), noise_rate)
+end

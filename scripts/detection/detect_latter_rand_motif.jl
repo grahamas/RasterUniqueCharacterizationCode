@@ -27,7 +27,7 @@ n_test_points=20
 α = 0.05 / 14
 results_key = (; boundary=boundary, trials=trials, n_bootstraps=n_bootstraps, n_resamples=n_resamples, α=α, n_test_points=n_test_points)
 subdir = if boundary isa Periodic
-    "AN_$(trials)trials_$(n_bootstraps)bs_periodic_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
+    "AN_$(trials)trials_$(n_bootstraps)bs_periodic_now()$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 elseif boundary isa ZeroPadded
     "AN_$(trials)trials_$(n_bootstraps)bs_zeropad_$(Dates.format(Dates.now(), "yyyy_mm_dd-HHMMSS"))"
 else

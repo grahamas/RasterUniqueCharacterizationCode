@@ -48,7 +48,7 @@ n_iterations = 100;
 
 % triple correlation function
 
-[class_contribution,class_count,contribution] = triple_correlation_class_contributions_continuous_2D_spatial_wr(raster, neuron_window, time_window);
+[class_contribution,class_count,contribution] = triple_correlation_class_contributions_2D_periodic(raster, neuron_window, time_window);
 temp_raster = raster(:,max_time_lag+1:N_times-max_time_lag);
 scale = numel(temp_raster);
 
@@ -63,7 +63,7 @@ for i = 1:n_iterations
     
     noise_raster{i,1} = cat(2,pre_noise_raster{i,1},curr_noise_raster{i,1},post_noise_raster{i,1});
     
-    [class_contribution_noise{i,1},class_count,contribution_noise] = triple_correlation_class_contributions_continuous_2D_spatial_wr(noise_raster{i,1}, neuron_window, time_window);
+    [class_contribution_noise{i,1},class_count,contribution_noise] = triple_correlation_class_contributions_2D_periodic(noise_raster{i,1}, neuron_window, time_window);
     
     scale = numel(curr_noise_raster{i,1});
     

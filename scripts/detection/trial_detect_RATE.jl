@@ -15,7 +15,7 @@ include(srcdir("peristimulus_testing.jl"))
 include(srcdir("filename_utils.jl"))
 
 let conditioned_on = Rate(),
-    postproc! = zscore!;
+    postproc! = divmean_zero!;
 
 #n_signals = 1
 norming="rate_divide"
@@ -55,7 +55,7 @@ plt = data(trial_results) * mapping(:signal_motif_numeral => sorter(1:14 .|> off
 axis = (; title = "$(n_trials) trials | $(n_tests) tests | $(n_signals) signals")
 fig = draw(plt; axis)
 
-outputdir = plotsdir("particular_trial_detects")
+outputdir = plotsdir("particular_trial_detects_RATE_$(floor(Int, time() * 1000))")
 mkpath(outputdir)
 save(joinpath(outputdir, "crossmotif_significances_$(fn2str(postproc!))_$(obj2str(conditioned_on))_trials$(n_trials)_tests$(n_tests)_signals$(n_signals)_spikes$(MEA_spikes)_size$(raster_size)_lags$(lag_extents).png"), fig)
 

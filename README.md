@@ -1,6 +1,10 @@
 # RasterUniqueCharacterizationCode
 
-All figures and results in Deshpande, Smith, & van Drongelen (2022, submitted) were created using [Matlab (Mathworks)](https://www.mathworks.com/products/matlab.html) R2021b, and can be replicated by running the appropriately named script in the `matlab` directory.
+### Replicating figures
+
+All original figures and results in Deshpande, Smith, & van Drongelen (2022, submitted) were created using [Matlab (Mathworks)](https://www.mathworks.com/products/matlab.html) R2021b, and can be replicated by running the appropriately named script in the `matlab` directory.
+
+For convenience we have provided the triple correlations precomputed for Figure 6.
 
 ### Julia
 
@@ -15,7 +19,7 @@ Much of the Matlab code is replicated in Julia, though no Julia code was used to
    ```
    julia> using Pkg
    julia> Pkg.add("DrWatson") # install globally, for using `quickactivate`
-   julia> Pkg.activate("path/to/this/project")
+   julia> Pkg.activate("path/to/RasterUniqueCharacterizationCode")
    julia> Pkg.instantiate()
    ```
 
